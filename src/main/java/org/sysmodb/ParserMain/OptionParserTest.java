@@ -2,7 +2,8 @@ package org.sysmodb.ParserMain;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class OptionParserTest {
 	
@@ -10,6 +11,10 @@ public class OptionParserTest {
 	public void testFormat() throws Exception {
 		String[] args=new String[]{"-o","xml"};
 		OptionParser p = new OptionParser(args);
+		assertEquals("xml",p.getOutputFormat());
+		
+		args=new String[]{"-f", "fred.txt","-o","xml"};
+		p = new OptionParser(args);
 		assertEquals("xml",p.getOutputFormat());
 	}
 	
@@ -24,5 +29,12 @@ public class OptionParserTest {
 		String[] args=new String[]{};
 		OptionParser p = new OptionParser(args);
 		assertEquals("xml",p.getOutputFormat());
+	}
+	
+	@Test
+	public void testDefaultFilenameNull() throws Exception {
+		String[] args=new String[]{};
+		OptionParser p = new OptionParser(args);
+		assertNull(p.getFilename());
 	}
 }

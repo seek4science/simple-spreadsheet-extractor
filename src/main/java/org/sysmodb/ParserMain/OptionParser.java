@@ -1,6 +1,5 @@
 package org.sysmodb.ParserMain;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,19 +9,22 @@ public class OptionParser {
 	private String outputFormat="xml";
 	
 	private static List<String> VALID_FORMATS = Arrays.asList("xml");
-	
-	
+		
 	public OptionParser(String [] args) throws InvalidOptionException {
-		for (int i=0;i<args.length;i++) {
+		for (int i=0;i<args.length;) {
 			String arg=args[i];
 			if (arg.equals("-o")) {
 				i++;
 				setOutputFormat(args[i]);
-				return;
+				break;
+			}
+			if (arg.equals("-f")) {
+				i++;
+				setFilename(args[i]);
+				break;
 			}
 			
-			throw new InvalidOptionException("Unrecognised option: "+args[i]);
-			
+			throw new InvalidOptionException("Unrecognised option: "+args[i]);			
 		}
 	}	
 
@@ -37,8 +39,15 @@ public class OptionParser {
 		}
 		else {
 			throw new InvalidOptionException("Invalid output format: "+format);
-		}
-		
+		}		
+	}
+
+	private void setFilename(String filename) {
+		this.filename = filename;
+	}
+
+	public String getFilename() {
+		return filename;
 	}
 	
 }
