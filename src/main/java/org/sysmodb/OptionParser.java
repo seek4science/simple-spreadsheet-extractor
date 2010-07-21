@@ -1,4 +1,4 @@
-package org.sysmodb.ParserMain;
+package org.sysmodb;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +11,7 @@ public class OptionParser {
 	private static List<String> VALID_FORMATS = Arrays.asList("xml");
 		
 	public OptionParser(String [] args) throws InvalidOptionException {
-		for (int i=0;i<args.length;) {
+		for (int i=0;i<args.length;i++) {
 			String arg=args[i];
 			if (arg.equals("-o")) {
 				i++;

@@ -1,4 +1,4 @@
-package org.sysmodb.ParserMain;
+package org.sysmodb;
 
 @SuppressWarnings("serial")
 public class InvalidOptionException extends Exception {
