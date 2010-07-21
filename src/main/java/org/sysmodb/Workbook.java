@@ -6,6 +6,7 @@ import java.io.InputStream;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Workbook {
 	
@@ -16,8 +17,7 @@ public class Workbook {
 			poi_workbook = new HSSFWorkbook(new BufferedInputStream(stream));
 		}
 		catch(OfficeXmlFileException e) { //
-			//TODO: handle XSLX documents here
-			throw e;
+			poi_workbook = new XSSFWorkbook(new BufferedInputStream(stream));			
 		}
 	}
 }
