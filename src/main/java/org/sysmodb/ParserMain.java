@@ -12,11 +12,15 @@ public class ParserMain {
 		processOptions(args);
 		try {
 			WorkbookParser workbook = new WorkbookParser(getInputStream());
+			if (options.getOutputFormat().equals("xml")) {
+				System.out.println(workbook.asXML());
+			}
 		} catch (IOException e) {
 			System.err.println("IO Error reading data: " + e.getMessage());
 			e.printStackTrace();
 			System.exit(-1);
 		}
+		System.exit(0);
 	}
 
 	public static void main(String[] args) {
