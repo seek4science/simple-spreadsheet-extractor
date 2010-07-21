@@ -10,7 +10,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.5-FINAL</version>
+			<version>3.6</version>
 			<exclusions>
 				<exclusion>
 					<groupId>javax.servlet</groupId>
@@ -49,6 +49,8 @@
 					<archive>
 						<manifest>
 							<mainClass>org.sysmodb.ParserMain</mainClass>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
 						</manifest>
 					</archive>
 				</configuration>

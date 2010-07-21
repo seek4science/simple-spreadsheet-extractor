@@ -14,10 +14,10 @@ public class Workbook {
 	
 	public Workbook(InputStream stream) throws IOException {
 		try {
-			poi_workbook = new HSSFWorkbook(new BufferedInputStream(stream));
+			poi_workbook = new HSSFWorkbook(stream);
 		}
 		catch(OfficeXmlFileException e) { //
-			poi_workbook = new XSSFWorkbook(new BufferedInputStream(stream));			
+			poi_workbook = new XSSFWorkbook(stream);			
 		}
 	}
 }
