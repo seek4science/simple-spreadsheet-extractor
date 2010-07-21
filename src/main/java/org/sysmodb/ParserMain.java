@@ -11,7 +11,7 @@ public class ParserMain {
 	public ParserMain(String[] args) {
 		processOptions(args);
 		try {
-			Workbook workbook = new Workbook(getInputStream());
+			WorkbookParser workbook = new WorkbookParser(getInputStream());
 		} catch (IOException e) {
 			System.err.println("IO Error reading data: " + e.getMessage());
 			e.printStackTrace();
