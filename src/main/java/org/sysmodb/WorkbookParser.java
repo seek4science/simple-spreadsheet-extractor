@@ -98,17 +98,22 @@ public class WorkbookParser {
 							case Cell.CELL_TYPE_BOOLEAN:
 								value=String.valueOf(cell.getBooleanCellValue());
 								break;
-							case Cell.CELL_TYPE_NUMERIC:
+							case Cell.CELL_TYPE_NUMERIC:								
 								value=String.valueOf(cell.getNumericCellValue());
 								break;
 							case Cell.CELL_TYPE_STRING:
 								value=cell.getStringCellValue();
 								break;
+							case Cell.CELL_TYPE_FORMULA:
+								value=cell.getCellFormula();
+								break;								
 							}
-							Element cellElement = rowElement.addElement("cell");
-							cellElement.addAttribute("column",String.valueOf(x));
-							cellElement.addAttribute("row", String.valueOf(y));
-							cellElement.setText(value);						
+							if (value!=null) {
+								Element cellElement = rowElement.addElement("cell");
+								cellElement.addAttribute("column",String.valueOf(x));
+								cellElement.addAttribute("row", String.valueOf(y));
+								cellElement.setText(value);
+							}
 						}
 					}
 				}
