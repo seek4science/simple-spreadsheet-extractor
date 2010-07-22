@@ -12,10 +12,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -72,7 +76,7 @@ public class WorkbookParser {
 			Sheet sheet = poi_workbook.getSheetAt(i);
 			
 			sheetElement.addAttribute("name", sheet.getSheetName());
-			sheetElement.addAttribute("index", String.valueOf(i));
+			sheetElement.addAttribute("index", String.valueOf(i+1));
 			sheetElement.addAttribute("hidden", String.valueOf(poi_workbook.isSheetHidden(i)));
 			sheetElement.addAttribute("very_hidden", String.valueOf(poi_workbook.isSheetVeryHidden(i)));
 			
@@ -84,34 +88,49 @@ public class WorkbookParser {
 				Row row = sheet.getRow(y);
 				if (row!=null) {
 					Element rowElement = sheetElement.addElement("row");
-					rowElement.addAttribute("index",String.valueOf(y));
+					rowElement.addAttribute("index",String.valueOf(y+1));
 					int firstCell = row.getFirstCellNum();
 					int lastCell = row.getLastCellNum();
 					for (int x=firstCell;x<=lastCell;x++) {
 						Cell cell = row.getCell(x);
 						if (cell !=null) {
 							String value=null;
+							String type=null;
 							switch (cell.getCellType()) {
 							case Cell.CELL_TYPE_BLANK:
 								value="";
+								type="blank";
 								break;
 							case Cell.CELL_TYPE_BOOLEAN:
 								value=String.valueOf(cell.getBooleanCellValue());
+								type="boolean";
 								break;
-							case Cell.CELL_TYPE_NUMERIC:								
-								value=String.valueOf(cell.getNumericCellValue());
+							case Cell.CELL_TYPE_NUMERIC:	
+								if (DateUtil.isCellDateFormatted(cell)) {
+									type="datetime";
+									Date dateCellValue = cell.getDateCellValue();
+									SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'H:m:sZ");
+									value=format.format(dateCellValue);
+								}
+								else {
+									value=String.valueOf(cell.getNumericCellValue());
+									type="numeric";
+								}								
 								break;
 							case Cell.CELL_TYPE_STRING:
 								value=cell.getStringCellValue();
+								type="string";
 								break;
 							case Cell.CELL_TYPE_FORMULA:
+								type="formula";
 								value="=" + cell.getCellFormula();
 								break;								
 							}
 							if (value!=null) {
 								Element cellElement = rowElement.addElement("cell");
-								cellElement.addAttribute("column",String.valueOf(x));
-								cellElement.addAttribute("row", String.valueOf(y));
+								cellElement.addAttribute("column",String.valueOf(x+1));
+								cellElement.addAttribute("row", String.valueOf(y+1));
+								cellElement.addAttribute("type", type);
 								cellElement.setText(value);
 							}
 						}
