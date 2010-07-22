@@ -33,6 +33,7 @@ import org.dom4j.io.XMLWriter;
 public class WorkbookParser {
 
 	private Workbook poi_workbook = null;
+	private final static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'H:m:sZ");
 
 	public WorkbookParser(InputStream stream) throws IOException {
 		
@@ -108,9 +109,8 @@ public class WorkbookParser {
 							case Cell.CELL_TYPE_NUMERIC:	
 								if (DateUtil.isCellDateFormatted(cell)) {
 									type="datetime";
-									Date dateCellValue = cell.getDateCellValue();
-									SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'H:m:sZ");
-									value=format.format(dateCellValue);
+									Date dateCellValue = cell.getDateCellValue();									
+									value=dateFormatter.format(dateCellValue);
 								}
 								else {
 									value=String.valueOf(cell.getNumericCellValue());
