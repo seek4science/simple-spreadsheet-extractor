@@ -105,7 +105,7 @@ public class WorkbookParser {
 								value=cell.getStringCellValue();
 								break;
 							case Cell.CELL_TYPE_FORMULA:
-								value=cell.getCellFormula();
+								value="=" + cell.getCellFormula();
 								break;								
 							}
 							if (value!=null) {
