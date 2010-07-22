@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>sysmo-db</groupId>
 	<artifactId>spreadsheet-parser</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.1</version>
 	<name>POI Based Spreadsheet parser</name>
 	<description>Simple command line app that translates a Spreadsheet file to and XML document</description>
 	<dependencies>
