@@ -1,7 +1,16 @@
 package org.sysmodb;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.StringWriter;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -14,23 +23,45 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
 public class WorkbookParser {
 
 	private Workbook poi_workbook = null;
 
 	public WorkbookParser(InputStream stream) throws IOException {
-		try {
-			poi_workbook = new HSSFWorkbook(stream);
-		} catch (OfficeXmlFileException e) { //
-			poi_workbook = new XSSFWorkbook(stream);
+		
+		File temp = File.createTempFile("poi-data", ".dat");
+		OutputStream out=new FileOutputStream(temp);
+		temp.deleteOnExit();
+		
+		byte [] buf = new byte[1024];
+		int len;
+		while ((len=stream.read(buf))>0) {
+			out.write(buf,0,len);
+		}
+		out.close();		
+		try {			
+			poi_workbook = new HSSFWorkbook(new FileInputStream(temp));
+		} catch (OfficeXmlFileException e) {						
+			poi_workbook = new XSSFWorkbook(new FileInputStream(temp));
 		}
 	}
 	
 	public String asXML() {
-		return asXMLDocument().asXML();
-		
-		
+		StringWriter out = new StringWriter();
+		XMLWriter writer = new XMLWriter(out, OutputFormat.createPrettyPrint());				
+		try {
+			writer.write(asXMLDocument());
+			writer.close();
+		} catch (IOException e) {
+			//should never get here, since we are using a StringWriter rather than IO based Writer
+			e.printStackTrace();
+			return null;
+		}
+		           
+		return out.toString();		
 	}
 	
 	public Document asXMLDocument() {

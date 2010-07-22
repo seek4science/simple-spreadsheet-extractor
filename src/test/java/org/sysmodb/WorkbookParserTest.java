@@ -19,6 +19,15 @@ public class WorkbookParserTest {
 		new WorkbookParser(stream);
 	}
 	
+	@Test	
+	public void testConstructXLSX() throws Exception {
+		URL resourceURL = WorkbookParserTest.class
+				.getResource("/test-spreadsheet.xlsx");
+		assertNotNull(resourceURL);
+		InputStream stream = resourceURL.openStream();
+		new WorkbookParser(stream);		
+	}
+	
 	@Test
 	public void testAsXMLSanity() throws Exception {
 		URL resourceURL = WorkbookParserTest.class
@@ -26,8 +35,7 @@ public class WorkbookParserTest {
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
 		WorkbookParser p = new WorkbookParser(stream);
-		assertNotNull(p.asXML());
-		System.out.println(p.asXML());
+		assertNotNull(p.asXML());		
 	}
 	
 	@Test
@@ -39,14 +47,24 @@ public class WorkbookParserTest {
 		WorkbookParser p = new WorkbookParser(stream);
 		assertNotNull(p.asXMLDocument());
 	}
-
+	
 	@Test
-	@Ignore
-	public void testConstruct2() throws Exception {
+	public void testAsXMLSanityXLSX() throws Exception {
 		URL resourceURL = WorkbookParserTest.class
 				.getResource("/test-spreadsheet.xlsx");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
-		new WorkbookParser(stream);
+		WorkbookParser p = new WorkbookParser(stream);
+		assertNotNull(p.asXML());		
 	}
+	
+	@Test
+	public void testAsDocumentSanityXLSX() throws Exception {
+		URL resourceURL = WorkbookParserTest.class
+				.getResource("/test-spreadsheet.xlsx");
+		assertNotNull(resourceURL);
+		InputStream stream = resourceURL.openStream();
+		WorkbookParser p = new WorkbookParser(stream);
+		assertNotNull(p.asXMLDocument());
+	}	
 }
