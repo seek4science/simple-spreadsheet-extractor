@@ -92,8 +92,8 @@ public class WorkbookParser {
 					rowElement.addAttribute("index",String.valueOf(y+1));
 					int firstCell = row.getFirstCellNum();
 					int lastCell = row.getLastCellNum();
-					rowElement.addAttribute("first_cell", String.valueOf(firstCell+1));
-					rowElement.addAttribute("last_cell", String.valueOf(lastCell+1));
+//					rowElement.addAttribute("first_cell", String.valueOf(firstCell+1));
+//					rowElement.addAttribute("last_cell", String.valueOf(lastCell+1));
 					for (int x=firstCell;x<=lastCell;x++) {
 						Cell cell = row.getCell(x);
 						if (cell !=null) {
