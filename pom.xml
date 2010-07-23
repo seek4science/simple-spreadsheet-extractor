@@ -53,7 +53,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>org.sysmodb.ParserMain</mainClass>
+							<mainClass>org.sysmodb.ExtractorMain</mainClass>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
 						</manifest>
