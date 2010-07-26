@@ -2,8 +2,10 @@ package org.sysmodb;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.StringBufferInputStream;
+import java.io.StringReader;
 import java.net.URL;
 
 import javax.xml.parsers.SAXParser;
@@ -12,6 +14,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 import org.junit.Test;
+import org.xml.sax.InputSource;
 
 public class WorkbookParserTest {
 
@@ -96,23 +99,18 @@ public class WorkbookParserTest {
 	}
 
 	private void validateAgainstSchema(String xml) throws Exception {
-		System.out.println(xml);
-		URL schemaURL = WorkbookParserTest.class.getResource("/schema-v1.xsd");
-		assertNotNull(schemaURL);
-		SAXParserFactory factory = SAXParserFactory.newInstance();
-		factory.setValidating(true);
-		factory.setNamespaceAware(true);
-
-		SAXParser parser = factory.newSAXParser();
-		parser.setProperty(
+		URL resource = WorkbookParserTest.class.getResource("/schema-v1.xsd");
+		SAXReader reader = new SAXReader(true);
+		reader.setFeature("http://apache.org/xml/features/validation/schema",
+				true);
+		reader.setProperty(
 				"http://java.sun.com/xml/jaxp/properties/schemaLanguage",
 				"http://www.w3.org/2001/XMLSchema");
-		parser.setProperty(
+		reader.setProperty(
 				"http://java.sun.com/xml/jaxp/properties/schemaSource",
-				schemaURL.toString());
-
-		SAXReader reader = new SAXReader(parser.getXMLReader());
-		Document doc = reader.read(new StringBufferInputStream(xml));
-
+				new File(resource.getFile()));		
+		InputSource source = new InputSource(new StringReader(xml));
+		source.setEncoding("UTF-8");
+		reader.read(source);
 	}
 }
