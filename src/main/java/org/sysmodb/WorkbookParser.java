@@ -27,6 +27,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.QName;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
@@ -70,10 +72,15 @@ public class WorkbookParser {
 	}
 	
 	public Document asXMLDocument() {
-		Document doc = DocumentHelper.createDocument();
-		Element root = doc.addElement("workbook");
-		for (int i=0;i<poi_workbook.getNumberOfSheets();i++) {
-			Element sheetElement = root.addElement("sheet");
+		Namespace xmlns = new Namespace("","http://www.sysmo-db.org/2010/xml/spreadsheet");		
+		QName workbookName = QName.get("workbook",xmlns);
+		
+		Document doc = DocumentHelper.createDocument();		
+		Element root = doc.addElement(workbookName);
+		
+		for (int i=0;i<poi_workbook.getNumberOfSheets();i++) {			
+			Element sheetElement = root.addElement("sheet");			
+			
 			Sheet sheet = poi_workbook.getSheetAt(i);
 			
 			sheetElement.addAttribute("name", sheet.getSheetName());
@@ -88,7 +95,7 @@ public class WorkbookParser {
 			for (int y=firstRow;y<=lastRow;y++) {
 				Row row = sheet.getRow(y);
 				if (row!=null) {
-					Element rowElement = sheetElement.addElement("row");
+					Element rowElement = sheetElement.addElement("row");					
 					rowElement.addAttribute("index",String.valueOf(y+1));
 					int firstCell = row.getFirstCellNum();
 					int lastCell = row.getLastCellNum();
@@ -129,7 +136,7 @@ public class WorkbookParser {
 								break;								
 							}
 							if (value!=null) {
-								Element cellElement = rowElement.addElement("cell");
+								Element cellElement = rowElement.addElement("cell");								
 								cellElement.addAttribute("column",String.valueOf(x+1));
 								cellElement.addAttribute("row", String.valueOf(y+1));
 								cellElement.addAttribute("type", type);
