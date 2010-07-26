@@ -44,8 +44,7 @@ public class WorkbookParserTest {
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
 		WorkbookParser p = new WorkbookParser(stream);
-		String xml = p.asXML();
-		System.out.println(xml);
+		String xml = p.asXML();		
 		validateAgainstSchema(xml);
 	}
 

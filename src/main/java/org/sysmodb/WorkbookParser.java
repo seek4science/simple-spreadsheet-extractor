@@ -95,13 +95,13 @@ public class WorkbookParser {
 					rowElement.addAttribute("index",String.valueOf(y+1));
 					int firstCell = row.getFirstCellNum();
 					int lastCell = row.getLastCellNum();
-//					rowElement.addAttribute("first_cell", String.valueOf(firstCell+1));
-//					rowElement.addAttribute("last_cell", String.valueOf(lastCell+1));
+					String formula=null;
 					for (int x=firstCell;x<=lastCell;x++) {
 						Cell cell = row.getCell(x);
 						if (cell !=null) {
+							//FIXME: too long and duplicates, needs refactoring
 							String value=null;
-							String type=null;
+							String type=null;														
 							switch (cell.getCellType()) {
 							case Cell.CELL_TYPE_BLANK:
 								value="";
@@ -126,22 +126,35 @@ public class WorkbookParser {
 								value=cell.getStringCellValue();
 								type="string";
 								break;
-							case Cell.CELL_TYPE_FORMULA:
-								type="formula";
+							case Cell.CELL_TYPE_FORMULA:								
 								
-								//FormulaEvaluator evaluator = poi_workbook.getCreationHelper().createFormulaEvaluator();
-								//CellValue cellValue = evaluator.evaluate(cell);
-								//value=cellValue.formatAsString();
-								
-								value="=" + cell.getCellFormula();								
+								FormulaEvaluator evaluator = poi_workbook.getCreationHelper().createFormulaEvaluator();
+								CellValue cellValue = evaluator.evaluate(cell);								
+								value=cellValue.formatAsString();
+								formula=cell.getCellFormula();
+								switch(cellValue.getCellType()) {
+								case Cell.CELL_TYPE_BOOLEAN:
+									type="boolean";
+									break;
+								case Cell.CELL_TYPE_STRING:
+									type="string";
+									break;
+								case Cell.CELL_TYPE_NUMERIC:
+									type="numeric";
+									break;
+								}
+																
 								break;								
 							}
-							if (value!=null) {
+							if (value!=null) {								
 								Element cellElement = rowElement.addElement("cell");								
 								cellElement.addAttribute("column",String.valueOf(x+1));
 								cellElement.addAttribute("column_alpha",column_alpha(x));
 								cellElement.addAttribute("row", String.valueOf(y+1));
 								cellElement.addAttribute("type", type);
+								if (formula!=null) {
+									cellElement.addAttribute("formula", formula);
+								}
 								cellElement.setText(value);
 							}
 						}
