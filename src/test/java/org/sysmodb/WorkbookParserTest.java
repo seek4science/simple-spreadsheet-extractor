@@ -98,7 +98,7 @@ public class WorkbookParserTest {
 		validateAgainstSchema(xml);
 	}
 
-	private void validateAgainstSchema(String xml) throws Exception {
+	private void validateAgainstSchema(String xml) throws Exception {		
 		URL resource = WorkbookParserTest.class.getResource("/schema-v1.xsd");
 		SAXReader reader = new SAXReader(true);
 		reader.setFeature("http://apache.org/xml/features/validation/schema",

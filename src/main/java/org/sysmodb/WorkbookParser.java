@@ -139,11 +139,15 @@ public class WorkbookParser {
 								case Cell.CELL_TYPE_STRING:
 									type="string";
 									break;
-								case Cell.CELL_TYPE_NUMERIC:
-									type="numeric";
-									break;
+								case Cell.CELL_TYPE_NUMERIC:											
+									type="numeric";					
+									if (DateUtil.isCellDateFormatted(cell)) {
+										type="datetime";																		
+										value=dateFormatter.format(DateUtil.getJavaDate(cellValue.getNumberValue()));
+									}
+									break;								
 								}
-																
+															
 								break;								
 							}
 							if (value!=null) {								
