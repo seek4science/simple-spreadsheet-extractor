@@ -13,7 +13,9 @@ import java.util.Date;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -126,12 +128,18 @@ public class WorkbookParser {
 								break;
 							case Cell.CELL_TYPE_FORMULA:
 								type="formula";
-								value="=" + cell.getCellFormula();
+								
+								//FormulaEvaluator evaluator = poi_workbook.getCreationHelper().createFormulaEvaluator();
+								//CellValue cellValue = evaluator.evaluate(cell);
+								//value=cellValue.formatAsString();
+								
+								value="=" + cell.getCellFormula();								
 								break;								
 							}
 							if (value!=null) {
 								Element cellElement = rowElement.addElement("cell");								
 								cellElement.addAttribute("column",String.valueOf(x+1));
+								cellElement.addAttribute("column_alpha",column_alpha(x));
 								cellElement.addAttribute("row", String.valueOf(y+1));
 								cellElement.addAttribute("type", type);
 								cellElement.setText(value);
@@ -143,5 +151,15 @@ public class WorkbookParser {
 			
 		}
 		return doc;
+	}
+
+	private String column_alpha(int col) {
+		String result = "";
+		while (col>-1) {
+			int letter = (col % 26);
+			result += Character.toString((char)(letter+65));
+			col = (col / 26) - 1;
+		}
+		return result;
 	}
 }
