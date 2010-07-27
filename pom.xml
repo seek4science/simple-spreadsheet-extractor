@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>sysmo-db.org</groupId>
 	<artifactId>simple-spreadsheet-extractor</artifactId>
-	<version>0.3.2-SNAPSHOT</version>
+	<version>0.3.2</version>
 	<name>POI Based Spreadsheet parser</name>
 	<description>Simple command line app that translates a Spreadsheet file to and XML document</description>
 	<dependencies>
