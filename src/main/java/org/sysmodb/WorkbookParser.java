@@ -174,7 +174,7 @@ public class WorkbookParser {
 		String result = "";
 		while (col>-1) {
 			int letter = (col % 26);
-			result += Character.toString((char)(letter+65));
+			result = Character.toString((char)(letter+65)) + result;
 			col = (col / 26) - 1;
 		}
 		return result;

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>sysmo-db.org</groupId>
 	<artifactId>simple-spreadsheet-extractor</artifactId>
-	<version>0.3.1</version>
+	<version>0.3.2-SNAPSHOT</version>
 	<name>POI Based Spreadsheet parser</name>
 	<description>Simple command line app that translates a Spreadsheet file to and XML document</description>
 	<dependencies>
@@ -17,13 +17,7 @@
 					<artifactId>servlet-api</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
-			<scope>test</scope>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
@@ -33,6 +27,19 @@
 			<groupId>dom4j</groupId>
 			<artifactId>dom4j</artifactId>			
 			<version>1.6.1</version>
+		</dependency>
+		<!--  TEST ONLY -->
+		<dependency>
+			<groupId>jaxen</groupId>
+			<artifactId>jaxen</artifactId>
+			<version>1.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>			
 		</dependency>
 	</dependencies>
 
