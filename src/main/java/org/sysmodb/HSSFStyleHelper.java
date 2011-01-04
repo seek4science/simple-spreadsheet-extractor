@@ -48,7 +48,7 @@ public class HSSFStyleHelper implements StyleHelper{
 	//Arial is default for Excel, Calibri is default for OO
 	if(!font.getFontName().equals("Arial") && !font.getFontName().equals("Calibri"))
 	    element.addElement("font-family").addText(font.getFontName());
-	if(font.getColor() != HSSFFont.COLOR_NORMAL)
+	if((font.getColor() != HSSFFont.COLOR_NORMAL) && !getRGBString(font.getColor()).equals("#000"))
 	    element.addElement("color").addText(getRGBString(font.getColor()));
     }
 
@@ -64,10 +64,16 @@ public class HSSFStyleHelper implements StyleHelper{
 	else
 	{
 	    short[] rgb = color.getTriplet();
+	    
 	    string = "#";
-	    string += Integer.toHexString((int) rgb[0]);
-	    string += Integer.toHexString((int) rgb[1]);
-	    string += Integer.toHexString((int) rgb[2]);
+	    for(int i = 0; i <= 2; i++)
+	    {
+	    	String colourSection = Integer.toHexString((int) rgb[i]);
+	    	if(colourSection.length() == 1)
+	    		colourSection = "0" + colourSection;
+	    	
+	    	string += colourSection;
+	    }
 	}
 
 
