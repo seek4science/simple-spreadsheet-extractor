@@ -7,6 +7,7 @@
 	<description>Simple command line app that translates a Spreadsheet file to an XML document
 
 Now with style elements</description>
+        <version>0.4.1</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -70,5 +71,4 @@ Now with style elements</description>
 			</plugin>
 		</plugins>
 	</build>
-    <version>0.4.1</version>
 </project>
