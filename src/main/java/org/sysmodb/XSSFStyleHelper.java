@@ -59,9 +59,14 @@ public class XSSFStyleHelper implements StyleHelper{
 	{
 	    byte[] rgb = colour.getRgb();
 	    string = "#";
-	    string += Integer.toHexString((int) rgb[0]);
-	    string += Integer.toHexString((int) rgb[1]);
-	    string += Integer.toHexString((int) rgb[2]);
+	    for(int i = 0; i <= 2; i++)
+	    {
+	    	String colourSection = Integer.toHexString((int) rgb[i]);
+	    	if(colourSection.length() == 1)
+	    		colourSection = "0" + colourSection;
+	    	
+	    	string += colourSection;
+	    }
 	}
 
 	return string;
