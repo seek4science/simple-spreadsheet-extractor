@@ -64,13 +64,6 @@ public class HSSFStyleHelper implements StyleHelper{
 	else
 	{
 	    short[] rgb = color.getTriplet();
-<<<<<<< HEAD
-	    string = "#";
-	    string += Integer.toHexString((int) rgb[0]);
-	    string += Integer.toHexString((int) rgb[1]);
-	    string += Integer.toHexString((int) rgb[2]);
-=======
-	    
 	    string = "#";
 	    for(int i = 0; i <= 2; i++)
 	    {
@@ -80,7 +73,6 @@ public class HSSFStyleHelper implements StyleHelper{
 	    	
 	    	string += colourSection;
 	    }
->>>>>>> 7ef1f9b7276b0a6fceb1a8adbcfe0f65fe2379bb
 	}
 
 
