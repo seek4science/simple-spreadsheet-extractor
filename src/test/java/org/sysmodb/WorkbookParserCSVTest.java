@@ -68,7 +68,6 @@ public class WorkbookParserCSVTest {
 
 		String expectedResult = expectedResult("/test-spreadsheet-for-csv-trimmed.csv");
 		assertEquals(expectedResult, csv);
-		System.out.println(expectedResult);
 	}
 
 	private String expectedResult(String resourceName) throws Exception {
