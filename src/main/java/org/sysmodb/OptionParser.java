@@ -7,6 +7,7 @@ public class OptionParser {
 
 	private String filename = null;
 	private String outputFormat = "xml";
+	private int sheet = -1;
 
 	private static List<String> VALID_FORMATS = Arrays.asList(new String [] {"xml","csv"});
 
@@ -21,12 +22,23 @@ public class OptionParser {
 				i++;
 				setFilename(args[i]);				
 			}
+			else if (arg.equals("-s")) {
+				i++;
+				setSheet(args[i]);
+			}
 			else {
 				throw new InvalidOptionException("Unrecognised option: " + args[i]);
 			}
 		}
+		//if CSV format and sheet is not defined, then defaults to the first sheet
+		if (getOutputFormat().equals("csv") && getSheet()==-1) {
+			sheet=1;
+		}
 	}
 
+	public int getSheet() {
+		return sheet;
+	}
 	public String getOutputFormat() {
 		return outputFormat;
 	}
@@ -46,6 +58,15 @@ public class OptionParser {
 
 	public String getFilename() {
 		return filename;
+	}
+	
+	private void setSheet(String sheet)  throws InvalidOptionException{
+		try {
+			this.sheet = Integer.parseInt(sheet);
+		}
+		catch(NumberFormatException e) {
+			throw new InvalidOptionException("Invalid sheet number supplied: '"+sheet+"'");
+		}
 	}
 
 }
