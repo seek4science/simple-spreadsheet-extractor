@@ -8,23 +8,22 @@ public class OptionParser {
 	private String filename = null;
 	private String outputFormat = "xml";
 
-	private static List<String> VALID_FORMATS = Arrays.asList("xml");
+	private static List<String> VALID_FORMATS = Arrays.asList(new String [] {"xml","csv"});
 
 	public OptionParser(String[] args) throws InvalidOptionException {
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
 			if (arg.equals("-o")) {
 				i++;
-				setOutputFormat(args[i]);
-				break;
+				setOutputFormat(args[i]);				
 			}
-			if (arg.equals("-f")) {
+			else if (arg.equals("-f")) {
 				i++;
-				setFilename(args[i]);
-				break;
+				setFilename(args[i]);				
 			}
-
-			throw new InvalidOptionException("Unrecognised option: " + args[i]);
+			else {
+				throw new InvalidOptionException("Unrecognised option: " + args[i]);
+			}
 		}
 	}
 

@@ -16,6 +16,11 @@ public class OptionParserTest {
 		args = new String[] { "-f", "fred.txt", "-o", "xml" };
 		p = new OptionParser(args);
 		assertEquals("xml", p.getOutputFormat());
+		assertEquals("fred.txt",p.getFilename());
+		
+		args = new String[] { "-f","fred.txt","-o","csv"};
+		p = new OptionParser(args);	
+		assertEquals("csv",p.getOutputFormat());
 	}
 
 	@Test
