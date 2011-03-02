@@ -16,7 +16,7 @@ import org.junit.Test;
 public class WorkbookParserCSVTest {
 
 	@Test
-	public void testAsCSVSanity() throws Exception {
+	public void testAsCSV() throws Exception {
 		URL resourceURL = WorkbookParserCSVTest.class
 				.getResource("/test-spreadsheet-for-csv.xls");
 		assertNotNull(resourceURL);
@@ -26,7 +26,48 @@ public class WorkbookParserCSVTest {
 		assertNotNull(csv);
 
 		String expectedResult = expectedResult("/test-spreadsheet-for-csv.csv");
-		assertEquals(expectedResult,csv);
+		assertEquals(expectedResult, csv);
+	}
+
+	@Test
+	public void testAsCSVAnotherSheet() throws Exception {
+		URL resourceURL = WorkbookParserCSVTest.class
+				.getResource("/test-spreadsheet-for-csv.xls");
+		assertNotNull(resourceURL);
+		InputStream stream = resourceURL.openStream();
+		WorkbookParser p = new WorkbookParser(stream);
+		String csv = p.asCSV(2);
+		assertNotNull(csv);
+
+		assertEquals(",,\"a\",1.0,TRUE,,FALSE", csv);
+	}
+
+	@Test
+	public void testCSVWithBlankRow() throws Exception {
+		URL resourceURL = WorkbookParserCSVTest.class
+				.getResource("/test-spreadsheet-for-csv.xls");
+		assertNotNull(resourceURL);
+		InputStream stream = resourceURL.openStream();
+		WorkbookParser p = new WorkbookParser(stream);
+		String csv = p.asCSV(3);
+		assertNotNull(csv);
+
+		String expectedResult = expectedResult("/test-spreadsheet-for-csv-blank-row.csv");
+		assertEquals(expectedResult, csv);
+	}
+
+	@Test
+	public void testAsCSVTrimmed() throws Exception {
+		URL resourceURL = WorkbookParserCSVTest.class
+				.getResource("/test-spreadsheet-for-csv.xls");
+		assertNotNull(resourceURL);
+		InputStream stream = resourceURL.openStream();
+		WorkbookParser p = new WorkbookParser(stream);
+		String csv = p.asCSV(1, true);
+		assertNotNull(csv);
+
+		String expectedResult = expectedResult("/test-spreadsheet-for-csv-trimmed.csv");
+		assertEquals(expectedResult, csv);
 		System.out.println(expectedResult);
 	}
 

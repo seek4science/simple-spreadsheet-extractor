@@ -15,6 +15,10 @@ public class ExtractorMain {
 			if (options.getOutputFormat().equals("xml")) {
 				System.out.println(workbook.asXML());
 			}
+			if (options.getOutputFormat().equals("csv")) {
+				System.out.println(workbook.asCSV(options.getSheet(),options.getTrim()));
+			}
+					
 		} catch (IOException e) {
 			System.err.println("IO Error reading data: " + e.getMessage());
 			e.printStackTrace();

@@ -2,6 +2,8 @@ package org.sysmodb;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
@@ -34,7 +36,23 @@ public class OptionParserTest {
 	@Test(expected = InvalidOptionException.class)
 	public void testBadSheet() throws Exception {
 		String[] args = new String[] { "-o", "xml","-s","a word" };
+		new OptionParser(args);
+	}
+	
+	@Test
+	public void testTrim() throws Exception {
+		String[] args = new String[] { "-o", "csv","-t" };
 		OptionParser p = new OptionParser(args);
+		assertEquals("csv", p.getOutputFormat());
+		assertTrue(p.getTrim());
+		
+		args = new String[] { "-o", "csv"};
+		p = new OptionParser(args);
+		assertFalse(p.getTrim());
+		
+		args = new String[] {"-t", "-o", "csv"};
+		p = new OptionParser(args);
+		assertTrue(p.getTrim());
 	}
 	
 	public void testDefaultSheet() throws Exception {
@@ -57,7 +75,7 @@ public class OptionParserTest {
 	@Test(expected = InvalidOptionException.class)
 	public void testBadFormat() throws Exception {
 		String[] args = new String[] { "-o", "pdf" };
-		OptionParser p = new OptionParser(args);
+		new OptionParser(args);
 	}
 
 	@Test

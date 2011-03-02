@@ -1,12 +1,3 @@
-//Modified by Finn Bacall Nov 2010
-//
-//Changes made:
-//- Added styles header, and style reference for styled cells
-//- Added columns header, with list of columns, first and last column index, and
-//  column width
-//- Added row height property
-
-
 package org.sysmodb;
 
 import java.io.File;
@@ -17,7 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -42,6 +32,11 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
 
+/**
+ * 
+ * @author Stuart Owen, Finn Bacall
+ *
+ */
 public class WorkbookParser {
 	
 	class CellInfo {
@@ -91,6 +86,10 @@ public class WorkbookParser {
 	}
 	
 	public String asCSV(int sheetIndex) {
+		return asCSV(sheetIndex,false);
+	}
+	
+	public String asCSV(int sheetIndex, boolean trim) {
 		//FIXME: this is a fairly naive implementation, just to get something working quickly.
 		//For a better implementation should do something event driven like:
 		//https://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/hssf/eventusermodel/examples/XLS2CSVmra.java
@@ -102,11 +101,19 @@ public class WorkbookParser {
 		int firstCol = 0;
 		List<String> stringRowTypes = Arrays.asList(new String[]{"string","datetime"});		
 		
-		for (int i=sheet.getFirstRowNum();i<lastRow;i++) {
+		if (trim) {
+			firstRow = sheet.getFirstRowNum();
+			firstCol = 257;
+		}
+		
+		for (int i=sheet.getFirstRowNum();i<=lastRow;i++) {
 			Row row = sheet.getRow(i);		
 			if (row !=null && row.getLastCellNum()>lastCol) {
 				lastCol=row.getLastCellNum();
-			}			
+			}						
+			if (trim && row != null && row.getFirstCellNum()<firstCol ) {
+				firstCol = row.getFirstCellNum();
+			}
 		}
 		
 		String blankRow = "";
@@ -122,6 +129,7 @@ public class WorkbookParser {
 					Cell cell = row.getCell(x);
 					CellInfo info = getCellInfo(cell);								
 					String value = info.value;
+					if (info.type.equalsIgnoreCase("boolean")) value = value.toUpperCase();
 					if (stringRowTypes.contains(info.type)) value = "\""+value+"\"";
 					csvRow+=value;
 					if (x!=lastCol-1) csvRow +=",";				

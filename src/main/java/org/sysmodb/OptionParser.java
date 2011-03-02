@@ -8,6 +8,7 @@ public class OptionParser {
 	private String filename = null;
 	private String outputFormat = "xml";
 	private int sheet = -1;
+	private boolean trim = false;
 
 	private static List<String> VALID_FORMATS = Arrays.asList(new String [] {"xml","csv"});
 
@@ -26,6 +27,9 @@ public class OptionParser {
 				i++;
 				setSheet(args[i]);
 			}
+			else if (arg.equals("-t")) {
+				trim=true;
+			}				
 			else {
 				throw new InvalidOptionException("Unrecognised option: " + args[i]);
 			}
@@ -34,6 +38,10 @@ public class OptionParser {
 		if (getOutputFormat().equals("csv") && getSheet()==-1) {
 			sheet=1;
 		}
+	}
+	
+	public boolean getTrim() {
+		return trim;
 	}
 
 	public int getSheet() {
