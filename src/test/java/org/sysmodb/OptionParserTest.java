@@ -53,6 +53,10 @@ public class OptionParserTest {
 		args = new String[] {"-t", "-o", "csv"};
 		p = new OptionParser(args);
 		assertTrue(p.getTrim());
+
+		args = new String[] {"-o", "csv","-s","1","-t"};
+		p = new OptionParser(args);
+		assertTrue(p.getTrim());
 	}
 	
 	public void testDefaultSheet() throws Exception {
