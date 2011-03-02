@@ -43,15 +43,6 @@ public class OptionParser {
 		return outputFormat;
 	}
 
-	private void setOutputFormat(String format) throws InvalidOptionException {
-		format = format.toLowerCase();
-		if (VALID_FORMATS.contains(format)) {
-			outputFormat = format;
-		} else {
-			throw new InvalidOptionException("Invalid output format: " + format);
-		}
-	}
-
 	private void setFilename(String filename) {
 		this.filename = filename;
 	}
@@ -66,6 +57,15 @@ public class OptionParser {
 		}
 		catch(NumberFormatException e) {
 			throw new InvalidOptionException("Invalid sheet number supplied: '"+sheet+"'");
+		}
+	}
+	
+	private void setOutputFormat(String format) throws InvalidOptionException {
+		format = format.toLowerCase();
+		if (VALID_FORMATS.contains(format)) {
+			outputFormat = format;
+		} else {
+			throw new InvalidOptionException("Invalid output format: " + format);
 		}
 	}
 

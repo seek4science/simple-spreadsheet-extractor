@@ -17,8 +17,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
@@ -39,7 +41,14 @@ import org.dom4j.QName;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
+
 public class WorkbookParser {
+	
+	class CellInfo {
+		public String type;
+		public String value;
+		public String formula;
+	}
 
 	private Workbook poi_workbook = null;
 	private StyleHelper styleHelper = null;
@@ -79,6 +88,54 @@ public class WorkbookParser {
 		}
 		           
 		return out.toString();		
+	}
+	
+	public String asCSV(int sheetIndex) {
+		//FIXME: this is a fairly naive implementation, just to get something working quickly.
+		//For a better implementation should do something event driven like:
+		//https://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/hssf/eventusermodel/examples/XLS2CSVmra.java
+		String result = "";
+		Sheet sheet = poi_workbook.getSheetAt(sheetIndex-1);
+		int lastRow = sheet.getLastRowNum();
+		int lastCol = -1;
+		int firstRow = 0;
+		int firstCol = 0;
+		List<String> stringRowTypes = Arrays.asList(new String[]{"string","datetime"});		
+		
+		for (int i=sheet.getFirstRowNum();i<lastRow;i++) {
+			Row row = sheet.getRow(i);		
+			if (row !=null && row.getLastCellNum()>lastCol) {
+				lastCol=row.getLastCellNum();
+			}			
+		}
+		
+		String blankRow = "";
+		for (int i=0;i<lastCol-1;i++) {
+			blankRow+=",";
+		}
+		
+		for (int y=firstRow;y<=lastRow;y++) {
+			Row row = sheet.getRow(y);
+			String csvRow = "";
+			if (row!=null) {
+				for (int x=firstCol;x<lastCol;x++) {
+					Cell cell = row.getCell(x);
+					CellInfo info = getCellInfo(cell);								
+					String value = info.value;
+					if (stringRowTypes.contains(info.type)) value = "\""+value+"\"";
+					csvRow+=value;
+					if (x!=lastCol-1) csvRow +=",";				
+				}
+				result+=csvRow;
+			}
+			else {
+				result+=blankRow;
+			}
+			
+			if (y!=lastRow) result+="\n";
+		}
+		
+		return result;
 	}
 	
 	public Document asXMLDocument() {
@@ -151,78 +208,28 @@ public class WorkbookParser {
 					    firstCol = firstCell;//Number of columns
 					int lastCell = row.getLastCellNum();
 					if(lastCell > lastCol)
-					    lastCol = lastCell;//Number of columns
-					String formula=null;
+					    lastCol = lastCell;//Number of columns					
 					for (int x=firstCell;x<=lastCell;x++) {
 						Cell cell = row.getCell(x);
 						if (cell !=null) {
-							//FIXME: too long and duplicates, needs refactoring
-							String value=null;
-							String type=null;														
-							switch (cell.getCellType()) {
-							case Cell.CELL_TYPE_BLANK:
-								value="";
-								type="blank";
-								break;
-							case Cell.CELL_TYPE_BOOLEAN:
-								value=String.valueOf(cell.getBooleanCellValue());
-								type="boolean";
-								break;
-							case Cell.CELL_TYPE_NUMERIC:	
-								if (DateUtil.isCellDateFormatted(cell)) {
-									type="datetime";
-									Date dateCellValue = cell.getDateCellValue();									
-									value=dateFormatter.format(dateCellValue);
-								}
-								else {
-									value=String.valueOf(cell.getNumericCellValue());
-									type="numeric";
-								}								
-								break;
-							case Cell.CELL_TYPE_STRING:
-								value=cell.getStringCellValue();
-								type="string";
-								break;
-							case Cell.CELL_TYPE_FORMULA:								
-								
-								FormulaEvaluator evaluator = poi_workbook.getCreationHelper().createFormulaEvaluator();
-								CellValue cellValue = evaluator.evaluate(cell);								
-								value=cellValue.formatAsString();
-								formula=cell.getCellFormula();
-								switch(cellValue.getCellType()) {
-								case Cell.CELL_TYPE_BOOLEAN:
-									type="boolean";
-									break;
-								case Cell.CELL_TYPE_STRING:
-									type="string";
-									break;
-								case Cell.CELL_TYPE_NUMERIC:											
-									type="numeric";					
-									if (DateUtil.isCellDateFormatted(cell)) {
-										type="datetime";																		
-										value=dateFormatter.format(DateUtil.getJavaDate(cellValue.getNumberValue()));
-									}
-									break;								
-								}
-															
-								break;								
-							}
-							if (value!=null) {								
+							CellInfo info = getCellInfo(cell);
+							
+							if (info.value!=null) {								
 								Element cellElement = rowElement.addElement("cell");								
 								cellElement.addAttribute("column",String.valueOf(x+1));
 								cellElement.addAttribute("column_alpha",column_alpha(x));
 								cellElement.addAttribute("row", String.valueOf(y+1));
-								cellElement.addAttribute("type", type);
+								cellElement.addAttribute("type", info.type);
 
 								//Cell style
 								//Need to check if style was removed for being empty, if so, cell has no style attribute
 								if(styleArray[cell.getCellStyle().getIndex()] != null)
 									cellElement.addAttribute("style", ("style"+cell.getCellStyle().getIndex()));
 								
-								if (formula!=null) {
-									cellElement.addAttribute("formula", formula);
+								if (info.formula!=null) {
+									cellElement.addAttribute("formula", info.formula);
 								}
-								cellElement.setText(value);
+								cellElement.setText(info.value);
 							}
 						}
 					}
@@ -250,5 +257,67 @@ public class WorkbookParser {
 			col = (col / 26) - 1;
 		}
 		return result;
+	}
+	
+	private CellInfo getCellInfo(Cell cell) {
+		//FIXME: too long and duplicates, needs refactoring
+		
+		CellInfo info = new CellInfo();
+		if (cell==null) {
+			info.value="";
+			info.type="blank";
+			info.formula=null;
+		}
+		else {
+			switch (cell.getCellType()) {
+			case Cell.CELL_TYPE_BLANK:
+				info.value="";
+				info.type="blank";
+				break;
+			case Cell.CELL_TYPE_BOOLEAN:
+				info.value=String.valueOf(cell.getBooleanCellValue());
+				info.type="boolean";
+				break;
+			case Cell.CELL_TYPE_NUMERIC:	
+				if (DateUtil.isCellDateFormatted(cell)) {
+					info.type="datetime";
+					Date dateCellValue = cell.getDateCellValue();									
+					info.value=dateFormatter.format(dateCellValue);
+				}
+				else {
+					info.value=String.valueOf(cell.getNumericCellValue());
+					info.type="numeric";
+				}								
+				break;
+			case Cell.CELL_TYPE_STRING:
+				info.value=cell.getStringCellValue();
+				info.type="string";
+				break;
+			case Cell.CELL_TYPE_FORMULA:								
+				
+				FormulaEvaluator evaluator = poi_workbook.getCreationHelper().createFormulaEvaluator();
+				CellValue cellValue = evaluator.evaluate(cell);								
+				info.value=cellValue.formatAsString();
+				info.formula=cell.getCellFormula();
+				switch(cellValue.getCellType()) {
+				case Cell.CELL_TYPE_BOOLEAN:
+					info.type="boolean";
+					break;
+				case Cell.CELL_TYPE_STRING:
+					info.type="string";
+					break;
+				case Cell.CELL_TYPE_NUMERIC:											
+					info.type="numeric";					
+					if (DateUtil.isCellDateFormatted(cell)) {
+						info.type="datetime";																		
+						info.value=dateFormatter.format(DateUtil.getJavaDate(cellValue.getNumberValue()));
+					}
+					break;								
+				}
+											
+				break;								
+			}
+		}
+		return info;
 	}
 }

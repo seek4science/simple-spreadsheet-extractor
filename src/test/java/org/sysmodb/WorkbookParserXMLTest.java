@@ -20,11 +20,11 @@ import org.dom4j.io.SAXReader;
 import org.junit.Test;
 import org.xml.sax.InputSource;
 
-public class WorkbookParserTest {
+public class WorkbookParserXMLTest {
 
 	@Test
 	public void testConstruct() throws Exception {
-		URL resourceURL = WorkbookParserTest.class
+		URL resourceURL = WorkbookParserXMLTest.class
 				.getResource("/test-spreadsheet.xls");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
@@ -33,7 +33,7 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testAsXMLSanity() throws Exception {
-		URL resourceURL = WorkbookParserTest.class
+		URL resourceURL = WorkbookParserXMLTest.class
 				.getResource("/test-spreadsheet.xls");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
@@ -43,7 +43,7 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testValidateXML() throws Exception {
-		URL resourceURL = WorkbookParserTest.class
+		URL resourceURL = WorkbookParserXMLTest.class
 				.getResource("/test-spreadsheet.xls");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
@@ -54,7 +54,7 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testAsDocumentSanity() throws Exception {
-		URL resourceURL = WorkbookParserTest.class
+		URL resourceURL = WorkbookParserXMLTest.class
 				.getResource("/test-spreadsheet.xls");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
@@ -64,7 +64,7 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testColumnAlphaValues() throws Exception {
-		URL resourceURL = WorkbookParserTest.class
+		URL resourceURL = WorkbookParserXMLTest.class
 				.getResource("/test-spreadsheet.xls");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
@@ -89,7 +89,7 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testFormulaEvaluation() throws Exception {
-		URL resourceURL = WorkbookParserTest.class
+		URL resourceURL = WorkbookParserXMLTest.class
 				.getResource("/test-spreadsheet.xls");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
@@ -109,7 +109,7 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testAsXMLSanityXLSX() throws Exception {
-		URL resourceURL = WorkbookParserTest.class
+		URL resourceURL = WorkbookParserXMLTest.class
 				.getResource("/test-spreadsheet.xlsx");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
@@ -119,7 +119,7 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testAsDocumentSanityXLSX() throws Exception {
-		URL resourceURL = WorkbookParserTest.class
+		URL resourceURL = WorkbookParserXMLTest.class
 				.getResource("/test-spreadsheet.xlsx");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
@@ -129,7 +129,7 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testConstructXLSX() throws Exception {
-		URL resourceURL = WorkbookParserTest.class
+		URL resourceURL = WorkbookParserXMLTest.class
 				.getResource("/test-spreadsheet.xlsx");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
@@ -138,7 +138,7 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testvalidateXLSXXML() throws Exception {
-		URL resourceURL = WorkbookParserTest.class
+		URL resourceURL = WorkbookParserXMLTest.class
 				.getResource("/test-spreadsheet.xlsx");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
@@ -148,7 +148,7 @@ public class WorkbookParserTest {
 	}
 
 	private void validateAgainstSchema(String xml) throws Exception {
-		URL resource = WorkbookParserTest.class.getResource("/schema-v1.xsd");
+		URL resource = WorkbookParserXMLTest.class.getResource("/schema-v1.xsd");
 		SAXReader reader = new SAXReader(true);
 		reader.setFeature("http://apache.org/xml/features/validation/schema",
 				true);
