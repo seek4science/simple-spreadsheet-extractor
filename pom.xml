@@ -12,7 +12,7 @@ Now with style elements</description>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.6</version>
+			<version>3.7</version>
 			<exclusions>
 				<exclusion>
 					<groupId>javax.servlet</groupId>
@@ -23,7 +23,7 @@ Now with style elements</description>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.6</version>
+			<version>3.7</version>
 		</dependency>
 		<dependency>
 			<groupId>dom4j</groupId>
