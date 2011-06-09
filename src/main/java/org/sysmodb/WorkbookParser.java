@@ -192,21 +192,23 @@ public class WorkbookParser {
 			sheetElement.addAttribute("index", String.valueOf(i+1));
 			sheetElement.addAttribute("hidden", String.valueOf(poi_workbook.isSheetHidden(i)));
 			sheetElement.addAttribute("very_hidden", String.valueOf(poi_workbook.isSheetVeryHidden(i)));
-			
-			int firstRow=sheet.getFirstRowNum();
-			int lastRow=sheet.getLastRowNum();
-			sheetElement.addAttribute("first_row", String.valueOf(firstRow+1));
-			sheetElement.addAttribute("last_row", String.valueOf(lastRow+1));
 
 			//Columns (for column widths - styling)
 			int lastCol=1;
 			int firstCol=1;
 			Element columnsElement = sheetElement.addElement("columns");
 			
+			int firstRow=sheet.getFirstRowNum();
+			int lastRow=sheet.getLastRowNum();
+			
+			Element rowsElement = sheetElement.addElement("rows");
+			rowsElement.addAttribute("first_row", String.valueOf(firstRow+1));
+			rowsElement.addAttribute("last_row", String.valueOf(lastRow+1));
+			
 			for (int y=firstRow;y<=lastRow;y++) {
 				Row row = sheet.getRow(y);
 				if (row!=null) {
-					Element rowElement = sheetElement.addElement("row");					
+					Element rowElement = rowsElement.addElement("row");					
 					rowElement.addAttribute("index",String.valueOf(y+1));
 					//Get height of row, if different from default
 					if(sheet.getDefaultRowHeightInPoints() != row.getHeightInPoints())
