@@ -251,7 +251,7 @@ public class WorkbookParser {
 			{
 				Element columnElement = columnsElement.addElement("column");
 				columnElement.addAttribute("index", String.valueOf(x+1));
-				columnElement.addAttribute("column_alpha", String.valueOf(column_alpha(x+1)));
+				columnElement.addAttribute("column_alpha", String.valueOf(column_alpha(x)));
 				columnElement.addAttribute("width", String.valueOf(sheet.getColumnWidth(x)));
 			}
 			
