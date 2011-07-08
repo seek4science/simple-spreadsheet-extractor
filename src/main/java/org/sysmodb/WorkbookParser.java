@@ -157,7 +157,7 @@ public class WorkbookParser {
 		Element root = doc.addElement(workbookName);
 
     //Element to hold the cell styles
-    Element stylesElement = root.addElement("styles");    
+		Element stylesElement = root.addElement("styles"); 
 
     //All the elements using each particular style
 		LinkedList[] styleMap = new LinkedList[poi_workbook.getNumCellStyles()];
@@ -193,9 +193,14 @@ public class WorkbookParser {
 					if(sheet.getDefaultRowHeightInPoints() != row.getHeightInPoints())
 					    rowElement.addAttribute("height",""+row.getHeightInPoints()+"pt");
 					
-					int firstCell = row.getFirstCellNum();					
-					if(firstCell > firstCol)
-				    firstCol = firstCell;//Number of columns
+					int firstCell = row.getFirstCellNum();
+					
+					//Skip if row has no cells
+					if(firstCell == -1)
+            continue;
+					
+					if(firstCell < firstCol)
+				    firstCol = firstCell + 1;//Number of columns
 					
 					int lastCell = row.getLastCellNum();					
 					if(lastCell > lastCol)
@@ -236,7 +241,7 @@ public class WorkbookParser {
 			
   		columnsElement.addAttribute("first_column", String.valueOf(firstCol));
 			columnsElement.addAttribute("last_column", String.valueOf(lastCol));
-			for(int x = 0; x < lastCol; x++)
+			for(int x = firstCol; x < lastCol; x++)
 			{
 				Element columnElement = columnsElement.addElement("column");
 				columnElement.addAttribute("index", String.valueOf(x+1));
@@ -267,13 +272,14 @@ public class WorkbookParser {
         break;
       }
 
-      Element styleElement = DocumentHelper.createElement("style");
+      Element styleElement = stylesElement.addElement("style");
       styleElement.addAttribute("id",("style"+s));
       StyleGenerator.createStyle(style,styleElement,styleHelper);
 
       //If we have an empty style element, its useless, so don't display it
       if(styleElement.elements().isEmpty())
       {
+        styleElement.detach();
         //Remove "style" attributes from cells that were linked to the blank style
         Iterator <Element> iter = styleMap[s].iterator();
         while(iter.hasNext())
@@ -288,6 +294,7 @@ public class WorkbookParser {
         // the duplicate
         if(styleHashTable.containsKey(styleHash))
         {            
+          styleElement.detach();
           Iterator <Element> iter = styleMap[s].iterator();
           while(iter.hasNext())
           {
@@ -296,8 +303,7 @@ public class WorkbookParser {
         }
         else
         {
-          styleHashTable.put(styleHash, s);
-          stylesElement.add(styleElement);
+          styleHashTable.put(styleHash, s);        
         }
       }        
     }
