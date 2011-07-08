@@ -70,12 +70,6 @@ public class OptionParserTest {
 		assertEquals(1,p.getSheet());
 	}
 
-	@Test
-	public void testFilename() throws Exception {
-		String[] args = new String[] {};
-		OptionParser p = new OptionParser(args);
-	}
-
 	@Test(expected = InvalidOptionException.class)
 	public void testBadFormat() throws Exception {
 		String[] args = new String[] { "-o", "pdf" };

@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
@@ -69,7 +70,7 @@ public class WorkbookParser {
 			styleHelper = new HSSFStyleHelper((HSSFWorkbook) poi_workbook);
 		} catch (OfficeXmlFileException e) {						
 			poi_workbook = new XSSFWorkbook(new FileInputStream(temp));
-			styleHelper = new XSSFStyleHelper((XSSFWorkbook) poi_workbook);
+			styleHelper = new XSSFStyleHelper();
 		}
 	}
 	
@@ -160,8 +161,8 @@ public class WorkbookParser {
 		Element stylesElement = root.addElement("styles"); 
 
     //All the elements using each particular style
-		LinkedList[] styleMap = new LinkedList[poi_workbook.getNumCellStyles()];
-
+		ArrayList <LinkedList<Element>> styleMap = new ArrayList<LinkedList<Element>>(poi_workbook.getNumCellStyles());
+		
 		for (int i=0;i<poi_workbook.getNumberOfSheets();i++) {			
 			Element sheetElement = root.addElement("sheet");			
 			
@@ -221,12 +222,12 @@ public class WorkbookParser {
 								//Cell style
 								//Add to style linked list
 								int styleIndex = cell.getCellStyle().getIndex();								
-								if(styleMap[styleIndex] == null)
+								if(styleMap.get(styleIndex) == null)
 								{
-								  styleMap[styleIndex] = new LinkedList();
+								  styleMap.set(styleIndex, new LinkedList<Element>());
 								}
 								
-                styleMap[styleIndex].add(cellElement);
+                styleMap.get(styleIndex).add(cellElement);
 								cellElement.addAttribute("style", ("style"+cell.getCellStyle().getIndex()));
 								
 								if (info.formula!=null) {
@@ -251,13 +252,13 @@ public class WorkbookParser {
 		}
 		
   	//Remove duplicate styles
-    Hashtable styleHashTable = new Hashtable();
+    Hashtable<Integer, Short> styleHashTable = new Hashtable<Integer, Short>();
     
     //Add style info to style element
     for (short s=0;s<poi_workbook.getNumCellStyles();s++) {
       
       //Don't bother rendering styles that aren't used in any cells!
-      if(styleMap[s] == null)
+      if(styleMap.get(s) == null)
         continue;
       
       CellStyle style;
@@ -281,7 +282,7 @@ public class WorkbookParser {
       {
         styleElement.detach();
         //Remove "style" attributes from cells that were linked to the blank style
-        Iterator <Element> iter = styleMap[s].iterator();
+        Iterator <Element> iter = styleMap.get(s).iterator();
         while(iter.hasNext())
         {
           iter.next().addAttribute("style",null);
@@ -295,7 +296,7 @@ public class WorkbookParser {
         if(styleHashTable.containsKey(styleHash))
         {            
           styleElement.detach();
-          Iterator <Element> iter = styleMap[s].iterator();
+          Iterator <Element> iter = styleMap.get(s).iterator();
           while(iter.hasNext())
           {
             iter.next().addAttribute("style","style"+styleHashTable.get(styleHash).toString());
