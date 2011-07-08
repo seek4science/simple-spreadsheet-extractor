@@ -10,7 +10,10 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedList;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
@@ -153,36 +156,12 @@ public class WorkbookParser {
 		Document doc = DocumentHelper.createDocument();		
 		Element root = doc.addElement(workbookName);
 
-                //Get all the CellStyles
-                Element stylesElement = root.addElement("styles");
-		CellStyle[] styleArray = new CellStyle[poi_workbook.getNumCellStyles()];
+    //Element to hold the cell styles
+    Element stylesElement = root.addElement("styles");    
 
-                for (short i=0;i<poi_workbook.getNumCellStyles();i++) {
-			CellStyle style;
-			try
-			{
-			    style = poi_workbook.getCellStyleAt(i);
-			}
-			//Sometimes XSLX messes up and reports wrong number of
-			// styles...
-			catch(IndexOutOfBoundsException e)
-			{
-			    break;
-			}
+    //All the elements using each particular style
+		LinkedList[] styleMap = new LinkedList[poi_workbook.getNumCellStyles()];
 
-			styleArray[i] = style;
-			Element styleElement = stylesElement.addElement("style");
-			styleElement.addAttribute("id",("style"+i));
-			StyleGenerator.createStyle(style,styleElement,styleHelper);
-
-			//If we have an empty style element, its useless, so don't display it
-			if(styleElement.elements().isEmpty())
-			{
-			    styleArray[i] = null;
-			    stylesElement.remove(styleElement);
-			}
-                }
-		
 		for (int i=0;i<poi_workbook.getNumberOfSheets();i++) {			
 			Element sheetElement = root.addElement("sheet");			
 			
@@ -213,12 +192,15 @@ public class WorkbookParser {
 					//Get height of row, if different from default
 					if(sheet.getDefaultRowHeightInPoints() != row.getHeightInPoints())
 					    rowElement.addAttribute("height",""+row.getHeightInPoints()+"pt");
-					int firstCell = row.getFirstCellNum();
+					
+					int firstCell = row.getFirstCellNum();					
 					if(firstCell > firstCol)
-					    firstCol = firstCell;//Number of columns
-					int lastCell = row.getLastCellNum();
+				    firstCol = firstCell;//Number of columns
+					
+					int lastCell = row.getLastCellNum();					
 					if(lastCell > lastCol)
-					    lastCol = lastCell;//Number of columns					
+				    lastCol = lastCell;//Number of columns	
+					
 					for (int x=firstCell;x<=lastCell;x++) {
 						Cell cell = row.getCell(x);
 						if (cell !=null) {
@@ -232,9 +214,15 @@ public class WorkbookParser {
 								cellElement.addAttribute("type", info.type);
 
 								//Cell style
-								//Need to check if style was removed for being empty, if so, cell has no style attribute
-								if(styleArray[cell.getCellStyle().getIndex()] != null)
-									cellElement.addAttribute("style", ("style"+cell.getCellStyle().getIndex()));
+								//Add to style linked list
+								int styleIndex = cell.getCellStyle().getIndex();								
+								if(styleMap[styleIndex] == null)
+								{
+								  styleMap[styleIndex] = new LinkedList();
+								}
+								
+                styleMap[styleIndex].add(cellElement);
+								cellElement.addAttribute("style", ("style"+cell.getCellStyle().getIndex()));
 								
 								if (info.formula!=null) {
 									cellElement.addAttribute("formula", info.formula);
@@ -244,8 +232,9 @@ public class WorkbookParser {
 						}
 					}
 				}
-			}
-			columnsElement.addAttribute("first_column", String.valueOf(firstCol));
+			}		
+			
+  		columnsElement.addAttribute("first_column", String.valueOf(firstCol));
 			columnsElement.addAttribute("last_column", String.valueOf(lastCol));
 			for(int x = 0; x < lastCol; x++)
 			{
@@ -253,9 +242,66 @@ public class WorkbookParser {
 				columnElement.addAttribute("index", String.valueOf(x+1));
 				columnElement.addAttribute("column_alpha", String.valueOf(column_alpha(x)));
 				columnElement.addAttribute("width", String.valueOf(sheet.getColumnWidth(x)));
-			}
-			
+			}			
 		}
+		
+  	//Remove duplicate styles
+    Hashtable styleHashTable = new Hashtable();
+    
+    //Add style info to style element
+    for (short s=0;s<poi_workbook.getNumCellStyles();s++) {
+      
+      //Don't bother rendering styles that aren't used in any cells!
+      if(styleMap[s] == null)
+        continue;
+      
+      CellStyle style;
+      try
+      {
+        style = poi_workbook.getCellStyleAt(s);
+      }
+      //Sometimes XSLX messes up and reports wrong number of
+      // styles...
+      catch(IndexOutOfBoundsException e)
+      {
+        break;
+      }
+
+      Element styleElement = DocumentHelper.createElement("style");
+      styleElement.addAttribute("id",("style"+s));
+      StyleGenerator.createStyle(style,styleElement,styleHelper);
+
+      //If we have an empty style element, its useless, so don't display it
+      if(styleElement.elements().isEmpty())
+      {
+        //Remove "style" attributes from cells that were linked to the blank style
+        Iterator <Element> iter = styleMap[s].iterator();
+        while(iter.hasNext())
+        {
+          iter.next().addAttribute("style",null);
+        }
+      }
+      else
+      {
+        int styleHash = StyleGenerator.getStyleHash(styleElement);
+        //Check a duplicate style doesn't already exist, if it does, point all cells to that style and delete
+        // the duplicate
+        if(styleHashTable.containsKey(styleHash))
+        {            
+          Iterator <Element> iter = styleMap[s].iterator();
+          while(iter.hasNext())
+          {
+            iter.next().addAttribute("style","style"+styleHashTable.get(styleHash).toString());
+          }
+        }
+        else
+        {
+          styleHashTable.put(styleHash, s);
+          stylesElement.add(styleElement);
+        }
+      }        
+    }
+		
 		return doc;
 	}
 
