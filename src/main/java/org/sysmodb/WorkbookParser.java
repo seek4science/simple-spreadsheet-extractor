@@ -160,8 +160,11 @@ public class WorkbookParser {
     //Element to hold the cell styles
 		Element stylesElement = root.addElement("styles"); 
 
-    //All the elements using each particular style
+    //Index: style ID, Value: List of elements (cells) using that style
 		ArrayList <LinkedList<Element>> styleMap = new ArrayList<LinkedList<Element>>(poi_workbook.getNumCellStyles());
+		for(int i = 0; i < poi_workbook.getNumCellStyles(); i++) {
+		  styleMap.add(new LinkedList<Element>()); 
+		}
 		
 		for (int i=0;i<poi_workbook.getNumberOfSheets();i++) {			
 			Element sheetElement = root.addElement("sheet");			
@@ -221,11 +224,7 @@ public class WorkbookParser {
 
 								//Cell style
 								//Add to style linked list
-								int styleIndex = cell.getCellStyle().getIndex();								
-								if(styleMap.get(styleIndex) == null)
-								{
-								  styleMap.set(styleIndex, new LinkedList<Element>());
-								}
+								int styleIndex = cell.getCellStyle().getIndex();
 								
                 styleMap.get(styleIndex).add(cellElement);
 								cellElement.addAttribute("style", ("style"+cell.getCellStyle().getIndex()));
@@ -258,7 +257,7 @@ public class WorkbookParser {
     for (short s=0;s<poi_workbook.getNumCellStyles();s++) {
       
       //Don't bother rendering styles that aren't used in any cells!
-      if(styleMap.get(s) == null)
+      if(styleMap.get(s).isEmpty())
         continue;
       
       CellStyle style;
