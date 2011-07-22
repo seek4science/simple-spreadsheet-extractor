@@ -86,6 +86,35 @@ public class WorkbookParserXMLTest {
 			assertEquals(exp, matches.get(0).getText());
 		}
 	}
+	
+  @Test
+  public void testNumberOfColumns() throws Exception {
+    URL resourceURL = WorkbookParserXMLTest.class
+        .getResource("/test-spreadsheet.xls");
+    assertNotNull(resourceURL);
+    InputStream stream = resourceURL.openStream();
+    WorkbookParser p = new WorkbookParser(stream);
+    Document doc = p.asXMLDocument();
+    System.out.println(p.asXML());
+
+    Namespace defNamespace = doc.getRootElement().getNamespace();
+    doc.getRootElement().addNamespace("bbb", defNamespace.getURI());
+    Map<String, String> namespaceURIs = new HashMap<String, String>();
+    namespaceURIs.put("bbb", defNamespace.getURI());
+    XPath xpath = DocumentHelper
+        .createXPath("//bbb:sheet[@index=\"1\"]//bbb:column");
+    xpath.setNamespaceURIs(namespaceURIs);
+    List<Node> matches = xpath.selectNodes(doc);
+    assertEquals(55, matches.size());
+    for (int n = 0; n < matches.size(); n++)
+    {
+      assertEquals(String.valueOf(n+1), matches.get(n).valueOf("@index"));
+    }
+    xpath = DocumentHelper.createXPath("//bbb:sheet[@index=\"1\"]//bbb:columns");
+    matches = xpath.selectNodes(doc);
+    assertEquals("1", matches.get(0).valueOf("@first_column"));
+    assertEquals("55", matches.get(0).valueOf("@last_column"));
+  }
 
 	@Test
 	public void testFormulaEvaluation() throws Exception {

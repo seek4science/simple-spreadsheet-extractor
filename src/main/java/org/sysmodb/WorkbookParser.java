@@ -241,7 +241,7 @@ public class WorkbookParser {
 			
   		columnsElement.addAttribute("first_column", String.valueOf(firstCol));
 			columnsElement.addAttribute("last_column", String.valueOf(lastCol));
-			for(int x = firstCol; x < lastCol; x++)
+			for(int x = firstCol-1; x < lastCol; x++)
 			{
 				Element columnElement = columnsElement.addElement("column");
 				columnElement.addAttribute("index", String.valueOf(x+1));
