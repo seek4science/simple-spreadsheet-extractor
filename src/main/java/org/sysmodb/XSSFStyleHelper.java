@@ -31,7 +31,7 @@ public class XSSFStyleHelper implements StyleHelper{
     if(font.getUnderline() != XSSFFont.U_NONE)
       element.addElement("text-decoration").addText("underline");
     if(font.getFontHeight() != XSSFFont.DEFAULT_FONT_SIZE)
-      element.addElement("font-size").addText(String.valueOf(font.getFontHeight() + "pt"));
+      element.addElement("font-size").addText(String.valueOf(font.getFontHeightInPoints()) + "pt");
     if(!font.getFontName().equals(XSSFFont.DEFAULT_FONT_NAME))
       element.addElement("font-family").addText(font.getFontName());
     if(font.getColor() != XSSFFont.DEFAULT_FONT_COLOR)
@@ -55,20 +55,14 @@ public class XSSFStyleHelper implements StyleHelper{
     }
     else
     {
-      byte[] rgb = colour.getRgb();
+      String rgb = colour.getARGBHex();
       //XSSF has a bug where the above can sometimes return null
       // so we check here
       if(rgb != null)
-      {
-        string = "#";
-        for(int i = 0; i < rgb.length; i++)
-        {
-          String colourSection = Integer.toHexString((int) rgb[i]);
-          if(colourSection.length() == 1)
-            colourSection = "0" + colourSection;
-  
-          string += colourSection;
-        }
+      {        
+        if(rgb.length() > 6)
+          rgb = rgb.substring(2,rgb.length());
+        string = "#" + rgb;
       }
     }
 
