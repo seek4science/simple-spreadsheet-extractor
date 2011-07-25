@@ -35,7 +35,13 @@ public class XSSFStyleHelper implements StyleHelper{
     if(!font.getFontName().equals(XSSFFont.DEFAULT_FONT_NAME))
       element.addElement("font-family").addText(font.getFontName());
     if(font.getColor() != XSSFFont.DEFAULT_FONT_COLOR)
-      element.addElement("color").addText(getRGBString(font.getXSSFColor()));
+    {
+      String colorString = getRGBString(font.getXSSFColor());
+      if(colorString != null)
+      {
+        element.addElement("color").addText(colorString);  
+      }      
+    }
   }
 
 
@@ -50,14 +56,19 @@ public class XSSFStyleHelper implements StyleHelper{
     else
     {
       byte[] rgb = colour.getRgb();
-      string = "#";
-      for(int i = 0; i <= 2; i++)
+      //XSSF has a bug where the above can sometimes return null
+      // so we check here
+      if(rgb != null)
       {
-        String colourSection = Integer.toHexString((int) rgb[i]);
-        if(colourSection.length() == 1)
-          colourSection = "0" + colourSection;
-
-        string += colourSection;
+        string = "#";
+        for(int i = 0; i < rgb.length; i++)
+        {
+          String colourSection = Integer.toHexString((int) rgb[i]);
+          if(colourSection.length() == 1)
+            colourSection = "0" + colourSection;
+  
+          string += colourSection;
+        }
       }
     }
 

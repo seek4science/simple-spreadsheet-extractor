@@ -155,6 +155,26 @@ public class WorkbookParserXMLTest {
 		WorkbookParser p = new WorkbookParser(stream);
 		assertNotNull(p.asXMLDocument());
 	}
+	
+  @Test
+  public void testJERMTemplatesParsableXLS() throws Exception {
+    URL resourceURL = WorkbookParserXMLTest.class
+        .getResource("/metabolites_intracellular.xls");
+    assertNotNull(resourceURL);
+    InputStream stream = resourceURL.openStream();
+    WorkbookParser p = new WorkbookParser(stream);
+    assertNotNull(p.asXML());
+  }
+  
+  @Test
+  public void testJERMTemplatesParsableXLSX() throws Exception {
+    URL resourceURL = WorkbookParserXMLTest.class
+        .getResource("/metabolites_intracellular.xls");
+    assertNotNull(resourceURL);
+    InputStream stream = resourceURL.openStream();
+    WorkbookParser p = new WorkbookParser(stream);
+    assertNotNull(p.asXML());
+  }
 
 	@Test
 	public void testConstructXLSX() throws Exception {
