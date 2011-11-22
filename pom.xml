@@ -7,24 +7,24 @@
 	<description>Simple command line app that translates a Spreadsheet file to an XML document
 
 Now with style elements</description>
-        <version>0.6.4</version>
+        <version>0.7-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>3.7</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+			<groupId>org.sysmo-db</groupId>
+			<artifactId>poi-rightfield</artifactId>
+			<version>3.8-beta4</version>			
+		</dependency>		
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.7</version>
-		</dependency>
+			<version>3.8-beta4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.poi</groupId>
+					<artifactId>poi</artifactId>					
+					</exclusion>
+			</exclusions>
+		</dependency>		
 		<dependency>
 			<groupId>dom4j</groupId>
 			<artifactId>dom4j</artifactId>
