@@ -1,11 +1,7 @@
 package org.sysmodb;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,11 +9,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellValue;
@@ -26,6 +22,7 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -49,29 +46,21 @@ public class WorkbookParser {
 		public String formula;
 	}
 
-	private Workbook poi_workbook = null;
+	private Workbook poiHelper = null;
 	private StyleHelper styleHelper = null;
 	private final static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'H:m:sZ");
 
-	public WorkbookParser(InputStream stream) throws IOException {
+	public WorkbookParser(InputStream stream) throws IOException, InvalidFormatException {
 		
-		File temp = File.createTempFile("poi-data", ".dat");
-		OutputStream out=new FileOutputStream(temp);
-		temp.deleteOnExit();
+		poiHelper = WorkbookFactory.create(stream);
 		
-		byte [] buf = new byte[1024];
-		int len;
-		while ((len=stream.read(buf))>0) {
-			out.write(buf,0,len);
-		}
-		out.close();		
-		try {			
-			poi_workbook = new HSSFWorkbook(new FileInputStream(temp));
-			styleHelper = new HSSFStyleHelper((HSSFWorkbook) poi_workbook);
-		} catch (OfficeXmlFileException e) {						
-			poi_workbook = new XSSFWorkbook(new FileInputStream(temp));
+		if (poiHelper instanceof XSSFWorkbook) {
 			styleHelper = new XSSFStyleHelper();
 		}
+		else {
+			styleHelper = new HSSFStyleHelper((HSSFWorkbook) poiHelper);
+		}
+						
 	}
 	
 	public String asXML() {
@@ -98,7 +87,7 @@ public class WorkbookParser {
 		//For a better implementation should do something event driven like:
 		//https://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/hssf/eventusermodel/examples/XLS2CSVmra.java
 		String result = "";
-		Sheet sheet = poi_workbook.getSheetAt(sheetIndex-1);
+		Sheet sheet = poiHelper.getSheetAt(sheetIndex-1);
 		int lastRow = sheet.getLastRowNum();
 		int lastCol = -1;
 		int firstRow = 0;
@@ -161,20 +150,20 @@ public class WorkbookParser {
 		Element stylesElement = root.addElement("styles"); 
 
     //Index: style ID, Value: List of elements (cells) using that style
-		ArrayList <LinkedList<Element>> styleMap = new ArrayList<LinkedList<Element>>(poi_workbook.getNumCellStyles());
-		for(int i = 0; i < poi_workbook.getNumCellStyles(); i++) {
+		ArrayList <LinkedList<Element>> styleMap = new ArrayList<LinkedList<Element>>(poiHelper.getNumCellStyles());
+		for(int i = 0; i < poiHelper.getNumCellStyles(); i++) {
 		  styleMap.add(new LinkedList<Element>()); 
 		}
 		
-		for (int i=0;i<poi_workbook.getNumberOfSheets();i++) {			
+		for (int i=0;i<poiHelper.getNumberOfSheets();i++) {			
 			Element sheetElement = root.addElement("sheet");			
 			
-			Sheet sheet = poi_workbook.getSheetAt(i);
+			Sheet sheet = poiHelper.getSheetAt(i);
 			
 			sheetElement.addAttribute("name", sheet.getSheetName());
 			sheetElement.addAttribute("index", String.valueOf(i+1));
-			sheetElement.addAttribute("hidden", String.valueOf(poi_workbook.isSheetHidden(i)));
-			sheetElement.addAttribute("very_hidden", String.valueOf(poi_workbook.isSheetVeryHidden(i)));
+			sheetElement.addAttribute("hidden", String.valueOf(poiHelper.isSheetHidden(i)));
+			sheetElement.addAttribute("very_hidden", String.valueOf(poiHelper.isSheetVeryHidden(i)));
 
 			//Columns (for column widths - styling)
 			int lastCol=1;
@@ -254,7 +243,7 @@ public class WorkbookParser {
     Hashtable<Integer, Short> styleHashTable = new Hashtable<Integer, Short>();
     
     //Add style info to style element
-    for (short s=0;s<poi_workbook.getNumCellStyles();s++) {
+    for (short s=0;s<poiHelper.getNumCellStyles();s++) {
       
       //Don't bother rendering styles that aren't used in any cells!
       if(styleMap.get(s).isEmpty())
@@ -263,7 +252,7 @@ public class WorkbookParser {
       CellStyle style;
       try
       {
-        style = poi_workbook.getCellStyleAt(s);
+        style = poiHelper.getCellStyleAt(s);
       }
       //Sometimes XSLX messes up and reports wrong number of
       // styles...
@@ -357,7 +346,7 @@ public class WorkbookParser {
 				break;
 			case Cell.CELL_TYPE_FORMULA:								
 				
-				FormulaEvaluator evaluator = poi_workbook.getCreationHelper().createFormulaEvaluator();
+				FormulaEvaluator evaluator = poiHelper.getCreationHelper().createFormulaEvaluator();
 				CellValue cellValue = evaluator.evaluate(cell);								
 				info.value=cellValue.formatAsString();
 				info.formula=cell.getCellFormula();

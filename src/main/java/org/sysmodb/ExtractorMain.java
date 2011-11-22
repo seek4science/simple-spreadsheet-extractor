@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+
 public class ExtractorMain {
 
 	private static OptionParser options;
@@ -21,6 +23,11 @@ public class ExtractorMain {
 					
 		} catch (IOException e) {
 			System.err.println("IO Error reading data: " + e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		catch (InvalidFormatException e) {
+			System.err.println("Invalid format reading data: " + e.getMessage());
 			e.printStackTrace();
 			System.exit(-1);
 		}
