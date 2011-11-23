@@ -147,6 +147,16 @@ public class WorkbookParserXMLTest {
 	}
 
 	@Test
+	public void testDataValidationsXLS() throws Exception {
+		URL resourceURL = WorkbookParserXMLTest.class
+		.getResource("/simple_annotated_book.xls");
+		assertNotNull(resourceURL);
+		InputStream stream = resourceURL.openStream();
+		WorkbookParser p = new WorkbookParser(stream);
+		System.out.println(p.asXML());
+	}
+	
+	@Test
 	public void testAsDocumentSanityXLSX() throws Exception {
 		URL resourceURL = WorkbookParserXMLTest.class
 				.getResource("/test-spreadsheet.xlsx");
