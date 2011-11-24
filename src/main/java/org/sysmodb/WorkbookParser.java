@@ -29,7 +29,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.xssf.usermodel.XSSFName;
+import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dom4j.Document;
@@ -161,7 +161,7 @@ public class WorkbookParser {
 		Document doc = DocumentHelper.createDocument();
 		Element root = doc.addElement(workbookName);
 		
-		Element namedRangesElement = root.addElement("named_range");
+		Element namedRangesElement = root.addElement("named_ranges");
 		namedRangesToXML(namedRangesElement);
 
 		// Element to hold the cell styles
@@ -245,22 +245,20 @@ public class WorkbookParser {
             Name name = poiWorkbook.getNameAt(i);            
             if(!name.isDeleted() && !name.isFunctionName()) {
             	Element namedRangeElement = namedRangesElement.addElement("named_range");
-            	String namename=name.getNameName();
-            	String formula=name.getRefersToFormula();
-            	String sheetName = name.getSheetName();
+            	String formula = name.getRefersToFormula();
             	AreaReference areaReference = new AreaReference(formula);
                 CellReference firstCellReference = areaReference.getFirstCell();
-                CellReference lastCellReference = areaReference.getLastCell();
-                namedRangeElement.addAttribute("name", namename);
-                namedRangeElement.addAttribute("sheet_name",sheetName);
-                namedRangeElement.addAttribute("refers_to_formula",formula);
-                namedRangeElement.addAttribute("start_col", String.valueOf(firstCellReference.getCol()+1));
-                namedRangeElement.addAttribute("start_row", String.valueOf(firstCellReference.getRow()+1));
-                namedRangeElement.addAttribute("last_col", String.valueOf(lastCellReference.getCol()+1));
+                CellReference lastCellReference = areaReference.getLastCell();                
+                namedRangeElement.addAttribute("first_column", String.valueOf(firstCellReference.getCol()+1));
+                namedRangeElement.addAttribute("first_row", String.valueOf(firstCellReference.getRow()+1));
+                namedRangeElement.addAttribute("last_column", String.valueOf(lastCellReference.getCol()+1));
                 namedRangeElement.addAttribute("last_row", String.valueOf(lastCellReference.getRow()+1));
+                
+                namedRangeElement.addElement("name").setText(name.getNameName());
+                namedRangeElement.addElement("sheet_name").setText(name.getSheetName());
+                namedRangeElement.addElement("refers_to_formula").setText(formula);
             }
-		}
-		
+		}		
 	}
 
 	private void sheetToXML(ArrayList<LinkedList<Element>> styleMap, int sheetIndex,
@@ -370,19 +368,30 @@ public class WorkbookParser {
 	}
 
 	private void xssfDataValidationsToXML(Element validations, XSSFSheet sheet) {
-		
+		List<XSSFDataValidation> validationData = sheet.getDataValidations();
+		for (XSSFDataValidation validation : validationData) {
+			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {
+				Element validationEl = validations.addElement("data_validation");
+				validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()));
+				validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()));
+				validationEl.addAttribute("start_column",String.valueOf(address.getFirstRow()));
+				validationEl.addAttribute("last_column",String.valueOf(address.getLastRow()));	
+				String formula = validation.getValidationConstraint().getFormula1();
+				validationEl.addElement("constraint").setText(formula);			
+			}			
+		}
 	}
 
 	private void hssfDataValidationsToXML(Element validations, HSSFSheet sheet) {
 		List<HSSFDataValidation> validationData = PatchedPoi.getInstance().getValidationData(sheet, sheet.getWorkbook());
 		for (HSSFDataValidation validation : validationData) {
 			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {
-				Element validationEl = validations.addElement("validation");
-				validationEl.addAttribute("start_col",String.valueOf(address.getFirstColumn()));
-				validationEl.addAttribute("end_col",String.valueOf(address.getLastColumn()));
-				validationEl.addAttribute("start_row",String.valueOf(address.getFirstRow()));
-				validationEl.addAttribute("end_row",String.valueOf(address.getLastRow()));		
-				validationEl.addAttribute("constraint", validation.getConstraint().getFormula1());			
+				Element validationEl = validations.addElement("data_validation");
+				validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()));
+				validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()));
+				validationEl.addAttribute("start_column",String.valueOf(address.getFirstRow()));
+				validationEl.addAttribute("last_column",String.valueOf(address.getLastRow()));		
+				validationEl.addElement("constraint").setText(validation.getConstraint().getFormula1());			
 			}			
 		}
 	}
