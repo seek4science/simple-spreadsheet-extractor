@@ -18,7 +18,7 @@
 
 	<xsd:complexType name="Styles">
 		<xsd:sequence>
-			<xsd:element name="style" type="Style" minOccurs="1"
+			<xsd:element name="style" type="Style" minOccurs="0"
 				maxOccurs="unbounded" />
 		</xsd:sequence>
 	</xsd:complexType>
