@@ -372,10 +372,10 @@ public class WorkbookParser {
 		for (XSSFDataValidation validation : validationData) {
 			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {
 				Element validationEl = validations.addElement("data_validation");
-				validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()));
-				validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()));
-				validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()));
-				validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()));	
+				validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
+				validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
+				validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
+				validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));	
 				String formula = validation.getValidationConstraint().getFormula1();
 				validationEl.addElement("constraint").setText(formula);			
 			}			
@@ -387,10 +387,10 @@ public class WorkbookParser {
 		for (HSSFDataValidation validation : validationData) {
 			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {
 				Element validationEl = validations.addElement("data_validation");
-				validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()));
-				validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()));
-				validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()));
-				validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()));		
+				validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
+				validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
+				validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
+				validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));		
 				validationEl.addElement("constraint").setText(validation.getConstraint().getFormula1());			
 			}			
 		}
