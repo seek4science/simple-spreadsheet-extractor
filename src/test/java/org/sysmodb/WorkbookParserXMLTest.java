@@ -51,6 +51,17 @@ public class WorkbookParserXMLTest {
 		String xml = p.asXML();
 		validateAgainstSchema(xml);
 	}
+	
+	@Test
+	public void testValidateAnnotatedXML() throws Exception {
+		URL resourceURL = WorkbookParserXMLTest.class
+				.getResource("/simple_annotated_book.xls");
+		assertNotNull(resourceURL);
+		InputStream stream = resourceURL.openStream();
+		WorkbookParser p = new WorkbookParser(stream);
+		String xml = p.asXML();
+		validateAgainstSchema(xml);
+	}
 
 	@Test
 	public void testAsDocumentSanity() throws Exception {

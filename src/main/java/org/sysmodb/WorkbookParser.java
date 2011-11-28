@@ -374,8 +374,8 @@ public class WorkbookParser {
 				Element validationEl = validations.addElement("data_validation");
 				validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()));
 				validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()));
-				validationEl.addAttribute("start_column",String.valueOf(address.getFirstRow()));
-				validationEl.addAttribute("last_column",String.valueOf(address.getLastRow()));	
+				validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()));
+				validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()));	
 				String formula = validation.getValidationConstraint().getFormula1();
 				validationEl.addElement("constraint").setText(formula);			
 			}			
@@ -389,8 +389,8 @@ public class WorkbookParser {
 				Element validationEl = validations.addElement("data_validation");
 				validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()));
 				validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()));
-				validationEl.addAttribute("start_column",String.valueOf(address.getFirstRow()));
-				validationEl.addAttribute("last_column",String.valueOf(address.getLastRow()));		
+				validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()));
+				validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()));		
 				validationEl.addElement("constraint").setText(validation.getConstraint().getFormula1());			
 			}			
 		}
