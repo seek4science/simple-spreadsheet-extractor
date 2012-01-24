@@ -72,8 +72,10 @@ public class WorkbookParser {
 	}
 
 	public String asXML() {
-		StringWriter out = new StringWriter();
+		StringWriter out = new StringWriter();					
 		XMLWriter writer = new XMLWriter(out, OutputFormat.createPrettyPrint());
+		writer.setEscapeText(true);
+		
 		try {
 			writer.write(asXMLDocument());
 			writer.close();
@@ -256,6 +258,8 @@ public class WorkbookParser {
                 
                 namedRangeElement.addElement("name").setText(name.getNameName());
                 namedRangeElement.addElement("sheet_name").setText(name.getSheetName());
+
+                formula = formula.replaceAll("\\p{C}", "?");
                 namedRangeElement.addElement("refers_to_formula").setText(formula);
             }
 		}		

@@ -62,6 +62,17 @@ public class WorkbookParserXMLTest {
 		String xml = p.asXML();
 		validateAgainstSchema(xml);
 	}
+	
+	@Test
+	public void testValidateXLSWithComplexValidations() throws Exception {
+		URL resourceURL = WorkbookParserXMLTest.class
+				.getResource("/complex_validations.xls");
+		assertNotNull(resourceURL);
+		InputStream stream = resourceURL.openStream();
+		WorkbookParser p = new WorkbookParser(stream);
+		String xml = p.asXML();		
+		validateAgainstSchema(xml);
+	}
 
 	@Test
 	public void testAsDocumentSanity() throws Exception {
@@ -80,8 +91,7 @@ public class WorkbookParserXMLTest {
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
 		WorkbookParser p = new WorkbookParser(stream);
-		Document doc = p.asXMLDocument();
-		System.out.println(p.asXML());
+		Document doc = p.asXMLDocument();		
 
 		Namespace defNamespace = doc.getRootElement().getNamespace();
 		doc.getRootElement().addNamespace("bbb", defNamespace.getURI());
@@ -105,8 +115,7 @@ public class WorkbookParserXMLTest {
     assertNotNull(resourceURL);
     InputStream stream = resourceURL.openStream();
     WorkbookParser p = new WorkbookParser(stream);
-    Document doc = p.asXMLDocument();
-    System.out.println(p.asXML());
+    Document doc = p.asXMLDocument();    
 
     Namespace defNamespace = doc.getRootElement().getNamespace();
     doc.getRootElement().addNamespace("bbb", defNamespace.getURI());
@@ -163,8 +172,7 @@ public class WorkbookParserXMLTest {
 		.getResource("/simple_annotated_book.xls");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
-		System.out.println(p.asXML());
+		WorkbookParser p = new WorkbookParser(stream);		
 	}
 	
 	@Test

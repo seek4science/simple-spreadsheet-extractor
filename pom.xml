@@ -7,7 +7,7 @@
 	<description>Simple command line app that translates a Spreadsheet file to an XML document
 
 Now with style elements</description>
-        <version>0.7.2</version>
+        <version>0.9</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.sysmo-db</groupId>
