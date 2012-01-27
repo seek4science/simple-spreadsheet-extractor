@@ -44,6 +44,12 @@ Now with style elements</description>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<repositories>
+	  <repository>
+	    <id>local-artifacts</id>
+	    <url>file://${basedir}/local-artifacts</url>
+	  </repository>
+	</repositories>
 
 	<build>
 		<plugins>
