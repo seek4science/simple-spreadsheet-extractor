@@ -3,10 +3,8 @@ package org.sysmodb;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -19,9 +17,6 @@ import org.apache.poi.hssf.util.AreaReference;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellValue;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Name;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -47,16 +42,9 @@ import org.dom4j.io.XMLWriter;
  */
 public class WorkbookParser {
 
-	class CellInfo {
-		public String type;
-		public String value;
-		public String formula;
-	}
-
 	private Workbook poiWorkbook = null;
 	private StyleHelper styleHelper = null;
-	private final static SimpleDateFormat dateFormatter = new SimpleDateFormat(
-			"yyyy-MM-dd'T'H:m:sZ");
+	
 
 	public WorkbookParser(InputStream stream) throws IOException,
 			InvalidFormatException {
@@ -68,7 +56,6 @@ public class WorkbookParser {
 		} else {
 			styleHelper = new HSSFStyleHelper((HSSFWorkbook) poiWorkbook);
 		}
-
 	}
 
 	public String asXML() {
@@ -133,7 +120,7 @@ public class WorkbookParser {
 			if (row != null) {
 				for (int x = firstCol; x < lastCol; x++) {
 					Cell cell = row.getCell(x);
-					CellInfo info = getCellInfo(cell);
+					CellInfo info = new CellInfo(cell,poiWorkbook);
 					String value = info.value;
 					if (info.type.equalsIgnoreCase("boolean"))
 						value = value.toUpperCase();
@@ -245,23 +232,29 @@ public class WorkbookParser {
 	private void namedRangesToXML(Element namedRangesElement) {
 		for(int i = 0; i < poiWorkbook.getNumberOfNames(); i++) {
             Name name = poiWorkbook.getNameAt(i);            
-            if(!name.isDeleted() && !name.isFunctionName()) {
-            	Element namedRangeElement = namedRangesElement.addElement("named_range");
-            	String formula = name.getRefersToFormula();
-            	AreaReference areaReference = new AreaReference(formula);
-                CellReference firstCellReference = areaReference.getFirstCell();
-                CellReference lastCellReference = areaReference.getLastCell();                
-                namedRangeElement.addAttribute("first_column", String.valueOf(firstCellReference.getCol()+1));
-                namedRangeElement.addAttribute("first_row", String.valueOf(firstCellReference.getRow()+1));
-                namedRangeElement.addAttribute("last_column", String.valueOf(lastCellReference.getCol()+1));
-                namedRangeElement.addAttribute("last_row", String.valueOf(lastCellReference.getRow()+1));
-                
-                namedRangeElement.addElement("name").setText(name.getNameName());
-                namedRangeElement.addElement("sheet_name").setText(name.getSheetName());
-
-                formula = formula.replaceAll("\\p{C}", "?");
-                namedRangeElement.addElement("refers_to_formula").setText(formula);
-            }
+            try {
+            	if(!name.isDeleted() && !name.isFunctionName()) {                	
+                	String formula = name.getRefersToFormula();                	
+                	AreaReference areaReference = new AreaReference(formula);
+                    CellReference firstCellReference = areaReference.getFirstCell();
+                    CellReference lastCellReference = areaReference.getLastCell();
+                    formula = formula.replaceAll("\\p{C}", "?");
+                    
+                    Element namedRangeElement = namedRangesElement.addElement("named_range");
+                    namedRangeElement.addAttribute("first_column", String.valueOf(firstCellReference.getCol()+1));
+                    namedRangeElement.addAttribute("first_row", String.valueOf(firstCellReference.getRow()+1));
+                    namedRangeElement.addAttribute("last_column", String.valueOf(lastCellReference.getCol()+1));
+                    namedRangeElement.addAttribute("last_row", String.valueOf(lastCellReference.getRow()+1));
+                    
+                    namedRangeElement.addElement("name").setText(name.getNameName());
+                    namedRangeElement.addElement("sheet_name").setText(name.getSheetName());
+                    
+                    namedRangeElement.addElement("refers_to_formula").setText(formula);
+                }
+            }            
+            catch(RuntimeException e) {
+            	//caused by an not implemented error in POI related to macros, and some invalid formala's that dont' relate to contiguous ranges.
+            }                                    
 		}		
 	}
 
@@ -316,7 +309,7 @@ public class WorkbookParser {
 				for (int x = firstCell; x <= lastCell; x++) {
 					Cell cell = row.getCell(x);
 					if (cell != null) {
-						CellInfo info = getCellInfo(cell);
+						CellInfo info = new CellInfo(cell,poiWorkbook);
 
 						if (info.value != null) {
 							Element cellElement = rowElement
@@ -374,14 +367,16 @@ public class WorkbookParser {
 	private void xssfDataValidationsToXML(Element validations, XSSFSheet sheet) {
 		List<XSSFDataValidation> validationData = sheet.getDataValidations();
 		for (XSSFDataValidation validation : validationData) {
-			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {
-				Element validationEl = validations.addElement("data_validation");
-				validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
-				validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
-				validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
-				validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));	
+			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {				
 				String formula = validation.getValidationConstraint().getFormula1();
-				validationEl.addElement("constraint").setText(formula);			
+				if (formula!=null) {
+					Element validationEl = validations.addElement("data_validation");
+					validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
+					validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
+					validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
+					validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));					
+					validationEl.addElement("constraint").setText(formula);
+				}						
 			}			
 		}
 	}
@@ -408,67 +403,5 @@ public class WorkbookParser {
 			col = (col / 26) - 1;
 		}
 		return result;
-	}
-
-	private CellInfo getCellInfo(Cell cell) {
-		// FIXME: too long and duplicates, needs refactoring
-
-		CellInfo info = new CellInfo();
-		if (cell == null) {
-			info.value = "";
-			info.type = "blank";
-			info.formula = null;
-		} else {
-			switch (cell.getCellType()) {
-			case Cell.CELL_TYPE_BLANK:
-				info.value = "";
-				info.type = "blank";
-				break;
-			case Cell.CELL_TYPE_BOOLEAN:
-				info.value = String.valueOf(cell.getBooleanCellValue());
-				info.type = "boolean";
-				break;
-			case Cell.CELL_TYPE_NUMERIC:
-				if (DateUtil.isCellDateFormatted(cell)) {
-					info.type = "datetime";
-					Date dateCellValue = cell.getDateCellValue();
-					info.value = dateFormatter.format(dateCellValue);
-				} else {
-					info.value = String.valueOf(cell.getNumericCellValue());
-					info.type = "numeric";
-				}
-				break;
-			case Cell.CELL_TYPE_STRING:
-				info.value = cell.getStringCellValue();
-				info.type = "string";
-				break;
-			case Cell.CELL_TYPE_FORMULA:
-
-				FormulaEvaluator evaluator = poiWorkbook.getCreationHelper()
-						.createFormulaEvaluator();
-				CellValue cellValue = evaluator.evaluate(cell);
-				info.value = cellValue.formatAsString();
-				info.formula = cell.getCellFormula();
-				switch (cellValue.getCellType()) {
-				case Cell.CELL_TYPE_BOOLEAN:
-					info.type = "boolean";
-					break;
-				case Cell.CELL_TYPE_STRING:
-					info.type = "string";
-					break;
-				case Cell.CELL_TYPE_NUMERIC:
-					info.type = "numeric";
-					if (DateUtil.isCellDateFormatted(cell)) {
-						info.type = "datetime";
-						info.value = dateFormatter.format(DateUtil
-								.getJavaDate(cellValue.getNumberValue()));
-					}
-					break;
-				}
-
-				break;
-			}
-		}
-		return info;
-	}
+	}	
 }
