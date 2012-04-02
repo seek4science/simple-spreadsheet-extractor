@@ -51,9 +51,9 @@ public class CellInfo {
 			case Cell.CELL_TYPE_FORMULA:
 
 				FormulaEvaluator evaluator = workbook.getCreationHelper()
-						.createFormulaEvaluator();
+						.createFormulaEvaluator();				
 				CellValue cellValue;
-				formula = cell.getCellFormula();
+				formula = cell.getCellFormula();				
 				try {
 					cellValue = evaluator.evaluate(cell);
 					value = cellValue.formatAsString();					
@@ -75,6 +75,10 @@ public class CellInfo {
 					}
 				}
 				catch(NotImplementedException e) {
+					type="error";
+					value=e.getMessage();
+				}
+				catch(RuntimeException e) {
 					type="error";
 					value=e.getMessage();
 				}

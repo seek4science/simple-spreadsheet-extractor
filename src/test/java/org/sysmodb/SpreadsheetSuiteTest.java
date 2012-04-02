@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.junit.Test;
 
@@ -18,6 +19,8 @@ import org.junit.Test;
  */
 public class SpreadsheetSuiteTest {
 	private final String ROOT = "spreadsheet_suite";
+	private static final Logger logger = Logger.getLogger("SpreadsheetSuiteTest");
+	private final boolean FAIL_QUIETLY = false;
 
 	/**
 	 * Tests each spreadsheet resource defined by
@@ -27,19 +30,31 @@ public class SpreadsheetSuiteTest {
 	public void testAll() throws Exception {
 
 		for (String name : getSpreadsheetResourceNames()) {
-			URL resourceURL = WorkbookParserXMLTest.class.getResource("/"
-					+ ROOT + "/" + name);
-			assertNotNull(resourceURL);
-			InputStream stream = resourceURL.openStream();
-			WorkbookParser p = new WorkbookParser(stream);
-			String xml = p.asXML();
-			SpreadsheetTestHelper.validateAgainstSchema(xml);
-
+			try {
+				URL resourceURL = WorkbookParserXMLTest.class.getResource("/"
+						+ ROOT + "/" + name);
+				assertNotNull(resourceURL);
+				InputStream stream = resourceURL.openStream();
+				WorkbookParser p = new WorkbookParser(stream);
+				String xml = p.asXML();				
+				SpreadsheetTestHelper.validateAgainstSchema(xml);
+			}
+			catch(Exception e) {
+				logger.severe("Error parsing "+name+" - "+e.getMessage());
+				if (!FAIL_QUIETLY) {
+					throw e;
+				}
+			}			
 		}
 	}
 
 	private List<String> getSpreadsheetResourceNames() {
-		return new ArrayList<String>();
+		List<String> names =  new ArrayList<String>();
+		names.add("problematic_spreadsheet.xls");		
+		names.add("problematic_spreadsheet2.xls");
+		names.add("problematic_spreadsheet3.xls");
+		
+		return names;
 	}
 
 }

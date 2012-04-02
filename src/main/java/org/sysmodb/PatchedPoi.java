@@ -2,6 +2,7 @@ package org.sysmodb;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.poi.hssf.record.DVRecord;
 import org.apache.poi.hssf.record.Record;
@@ -31,6 +32,8 @@ import org.apache.poi.ss.util.CellRangeAddressList;
  * @author Stuart Owen 
  */
 public class PatchedPoi {
+	
+	private static final Logger logger = Logger.getAnonymousLogger();
 
 	private static PatchedPoi instance = new PatchedPoi();
 
@@ -45,49 +48,55 @@ public class PatchedPoi {
 	public List<HSSFDataValidation> getValidationData(final HSSFSheet sheet,
 			final HSSFWorkbook workbook) {
 		final List<HSSFDataValidation> dataValidation = new ArrayList<HSSFDataValidation>();
-		DataValidityTable dvt = sheet.getDataValidityTable();
-		dvt.visitContainedRecords(new RecordAggregate.RecordVisitor() {
-			/**
-			 * /** Implementors may call non-mutating methods on Record r.
-			 * 
-			 * @param r must not be <code>null</code>
-			 *            
-			 */
-			public void visitRecord(Record r) {
-				if (r instanceof DVRecord) {
-					DVRecord dvRecord = (DVRecord) r;
-					CellRangeAddressList cellRangeAddressList = dvRecord
-							.getCellRangeAddress();
-					int validationType = dvRecord.getDataType();
-					if (validationType == DVConstraint.ValidationType.LIST) {
-						Formula f1 = dvRecord.getFormula1();
-						String formula1 = getStringFromPtgTokens(
-								f1.getTokens(), workbook);
-						DVConstraint dvConstraint = DVConstraint
-								.createFormulaListConstraint(formula1);
-						HSSFDataValidation validation = new HSSFDataValidation(
-								cellRangeAddressList, dvConstraint);
-						dataValidation.add(validation);
-					} else if (validationType == DVConstraint.ValidationType.INTEGER
-							|| validationType == DVConstraint.ValidationType.DECIMAL
-							|| validationType == DVConstraint.ValidationType.TEXT_LENGTH) {
-						Formula f1 = dvRecord.getFormula1();
-						Formula f2 = dvRecord.getFormula2();
-						String formula1 = getStringFromPtgTokens(
-								f1.getTokens(), workbook);
-						String formula2 = getStringFromPtgTokens(
-								f2.getTokens(), workbook);
-						int comparison = dvRecord.getConditionOperator();
-						DVConstraint dvConstraint = DVConstraint
-								.createNumericConstraint(validationType,
-										comparison, formula1, formula2);
-						HSSFDataValidation validation = new HSSFDataValidation(
-								cellRangeAddressList, dvConstraint);
-						dataValidation.add(validation);
+		try {
+			DataValidityTable dvt = sheet.getDataValidityTable();
+			dvt.visitContainedRecords(new RecordAggregate.RecordVisitor() {
+				/**
+				 * /** Implementors may call non-mutating methods on Record r.
+				 * 
+				 * @param r must not be <code>null</code>
+				 *            
+				 */
+				public void visitRecord(Record r) {
+					if (r instanceof DVRecord) {
+						DVRecord dvRecord = (DVRecord) r;
+						CellRangeAddressList cellRangeAddressList = dvRecord
+								.getCellRangeAddress();
+						int validationType = dvRecord.getDataType();
+						if (validationType == DVConstraint.ValidationType.LIST) {
+							Formula f1 = dvRecord.getFormula1();
+							String formula1 = getStringFromPtgTokens(
+									f1.getTokens(), workbook);
+							DVConstraint dvConstraint = DVConstraint
+									.createFormulaListConstraint(formula1);
+							HSSFDataValidation validation = new HSSFDataValidation(
+									cellRangeAddressList, dvConstraint);
+							dataValidation.add(validation);
+						} else if (validationType == DVConstraint.ValidationType.INTEGER
+								|| validationType == DVConstraint.ValidationType.DECIMAL
+								|| validationType == DVConstraint.ValidationType.TEXT_LENGTH) {
+							Formula f1 = dvRecord.getFormula1();
+							Formula f2 = dvRecord.getFormula2();
+							String formula1 = getStringFromPtgTokens(
+									f1.getTokens(), workbook);
+							String formula2 = getStringFromPtgTokens(
+									f2.getTokens(), workbook);
+							int comparison = dvRecord.getConditionOperator();
+							DVConstraint dvConstraint = DVConstraint
+									.createNumericConstraint(validationType,
+											comparison, formula1, formula2);
+							HSSFDataValidation validation = new HSSFDataValidation(
+									cellRangeAddressList, dvConstraint);
+							dataValidation.add(validation);
+						}
 					}
 				}
-			}
-		});
+			});
+		}
+		catch(IllegalStateException e) {
+			logger.warning("Unable to read data validations - "+e.getMessage());
+		}
+		
 		return dataValidation;
 	}
 

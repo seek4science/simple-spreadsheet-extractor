@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
 
+import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.InputSource;
 
@@ -35,7 +36,14 @@ public class SpreadsheetTestHelper {
 				new File(resource.getFile()));
 		InputSource source = new InputSource(new StringReader(xml));
 		source.setEncoding("UTF-8");
-		reader.read(source);
-	}
+		try {
+			reader.read(source);
+		}
+		catch(DocumentException e) {
+			System.out.println(xml);
+			throw e;
+		}
+		
+	}	
 
 }

@@ -40,12 +40,11 @@ import org.dom4j.io.XMLWriter;
  * @author Stuart Owen, Finn Bacall
  * 
  */
-public class WorkbookParser {
+public class WorkbookParser {	
 
 	private Workbook poiWorkbook = null;
 	private StyleHelper styleHelper = null;
 	
-
 	public WorkbookParser(InputStream stream) throws IOException,
 			InvalidFormatException {
 
@@ -54,16 +53,19 @@ public class WorkbookParser {
 		if (poiWorkbook instanceof XSSFWorkbook) {
 			styleHelper = new XSSFStyleHelper();
 		} else {
-			styleHelper = new HSSFStyleHelper((HSSFWorkbook) poiWorkbook);
+			styleHelper = new HSSFStyleHelper((HSSFWorkbook) poiWorkbook);			
 		}
 	}
 
 	public String asXML() {
-		StringWriter out = new StringWriter();					
-		XMLWriter writer = new XMLWriter(out, OutputFormat.createPrettyPrint());
-		writer.setEscapeText(true);
+		StringWriter out = new StringWriter();
+		OutputFormat format = OutputFormat.createPrettyPrint();
+		format.setEncoding("UTF-8");		
+		XMLWriter writer = new ControlCharStrippingXMLWriter(out, format);
 		
-		try {
+		writer.setEscapeText(true);						
+		
+		try {			
 			writer.write(asXMLDocument());
 			writer.close();
 		} catch (IOException e) {
@@ -146,8 +148,9 @@ public class WorkbookParser {
 		Namespace xmlns = new Namespace("",
 				"http://www.sysmo-db.org/2010/xml/spreadsheet");
 		QName workbookName = QName.get("workbook", xmlns);
-
-		Document doc = DocumentHelper.createDocument();
+		
+		Document doc = DocumentHelper.createDocument();		
+		
 		Element root = doc.addElement(workbookName);
 		
 		Element namedRangesElement = root.addElement("named_ranges");
