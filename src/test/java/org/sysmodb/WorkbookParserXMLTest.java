@@ -3,9 +3,7 @@ package org.sysmodb;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.File;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -16,9 +14,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Namespace;
 import org.dom4j.Node;
 import org.dom4j.XPath;
-import org.dom4j.io.SAXReader;
 import org.junit.Test;
-import org.xml.sax.InputSource;
 
 public class WorkbookParserXMLTest {
 
@@ -32,66 +28,41 @@ public class WorkbookParserXMLTest {
 	}
 
 	@Test
-	public void testAsXMLSanity() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/test-spreadsheet.xls");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
-		assertNotNull(p.asXML());
+	public void testValidateXML() throws Exception {
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/test-spreadsheet.xls");
+		String xml = p.asXML();
+		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
 
 	@Test
-	public void testValidateXML() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/test-spreadsheet.xls");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
-		String xml = p.asXML();
-		validateAgainstSchema(xml);
-	}
-	
-	@Test
 	public void testValidateAnnotatedXML() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/simple_annotated_book.xls");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/simple_annotated_book.xls");
 		String xml = p.asXML();
-		validateAgainstSchema(xml);
+		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
-	
+
 	@Test
 	public void testValidateXLSWithComplexValidations() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/complex_validations.xls");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
-		String xml = p.asXML();		
-		validateAgainstSchema(xml);
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/complex_validations.xls");
+		String xml = p.asXML();
+		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
 
 	@Test
 	public void testAsDocumentSanity() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/test-spreadsheet.xls");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/test-spreadsheet.xls");
 		assertNotNull(p.asXMLDocument());
 	}
 
 	@Test
 	public void testColumnAlphaValues() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/test-spreadsheet.xls");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
-		Document doc = p.asXMLDocument();		
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/test-spreadsheet.xls");
+		Document doc = p.asXMLDocument();
 
 		Namespace defNamespace = doc.getRootElement().getNamespace();
 		doc.getRootElement().addNamespace("bbb", defNamespace.getURI());
@@ -108,43 +79,38 @@ public class WorkbookParserXMLTest {
 			assertEquals(exp, matches.get(0).getText());
 		}
 	}
-	
-  @SuppressWarnings("unchecked")
-@Test
-  public void testNumberOfColumns() throws Exception {
-    URL resourceURL = WorkbookParserXMLTest.class
-        .getResource("/test-spreadsheet.xls");
-    assertNotNull(resourceURL);
-    InputStream stream = resourceURL.openStream();
-    WorkbookParser p = new WorkbookParser(stream);
-    Document doc = p.asXMLDocument();    
 
-    Namespace defNamespace = doc.getRootElement().getNamespace();
-    doc.getRootElement().addNamespace("bbb", defNamespace.getURI());
-    Map<String, String> namespaceURIs = new HashMap<String, String>();
-    namespaceURIs.put("bbb", defNamespace.getURI());
-    XPath xpath = DocumentHelper
-        .createXPath("//bbb:sheet[@index=\"1\"]//bbb:column");
-    xpath.setNamespaceURIs(namespaceURIs);    
-	List<Node> matches = xpath.selectNodes(doc);
-    assertEquals(55, matches.size());
-    for (int n = 0; n < matches.size(); n++)
-    {
-      assertEquals(String.valueOf(n+1), matches.get(n).valueOf("@index"));
-    }
-    xpath = DocumentHelper.createXPath("//bbb:sheet[@index=\"1\"]//bbb:columns");
-    matches = xpath.selectNodes(doc);
-    assertEquals("1", matches.get(0).valueOf("@first_column"));
-    assertEquals("55", matches.get(0).valueOf("@last_column"));
-  }
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testNumberOfColumns() throws Exception {
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/test-spreadsheet.xls");
+		Document doc = p.asXMLDocument();
+
+		Namespace defNamespace = doc.getRootElement().getNamespace();
+		doc.getRootElement().addNamespace("bbb", defNamespace.getURI());
+		Map<String, String> namespaceURIs = new HashMap<String, String>();
+		namespaceURIs.put("bbb", defNamespace.getURI());
+		XPath xpath = DocumentHelper
+				.createXPath("//bbb:sheet[@index=\"1\"]//bbb:column");
+		xpath.setNamespaceURIs(namespaceURIs);
+		List<Node> matches = xpath.selectNodes(doc);
+		assertEquals(55, matches.size());
+		for (int n = 0; n < matches.size(); n++) {
+			assertEquals(String.valueOf(n + 1), matches.get(n)
+					.valueOf("@index"));
+		}
+		xpath = DocumentHelper
+				.createXPath("//bbb:sheet[@index=\"1\"]//bbb:columns");
+		matches = xpath.selectNodes(doc);
+		assertEquals("1", matches.get(0).valueOf("@first_column"));
+		assertEquals("55", matches.get(0).valueOf("@last_column"));
+	}
 
 	@Test
 	public void testFormulaEvaluation() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/test-spreadsheet.xls");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/test-spreadsheet.xls");
 		Document doc = p.asXMLDocument();
 
 		Namespace defNamespace = doc.getRootElement().getNamespace();
@@ -160,90 +126,45 @@ public class WorkbookParserXMLTest {
 	}
 
 	@Test
-	public void testAsXMLSanityXLSX() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/test-spreadsheet.xlsx");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
+	public void testAsXMLForXLSX() throws Exception {
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/test-spreadsheet.xlsx");
 		assertNotNull(p.asXML());
+		SpreadsheetTestHelper.validateAgainstSchema(p.asXML());
 	}
 
 	@Test
 	public void testDataValidationsXLS() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-		.getResource("/simple_annotated_book.xls");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);	
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/simple_annotated_book.xls");
 		assertNotNull(p.asXMLDocument());
-		String xml = p.asXML();		
-		validateAgainstSchema(xml);
+		String xml = p.asXML();
+		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
-	
+
 	@Test
 	public void testAsDocumentSanityXLSX() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/test-spreadsheet.xlsx");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/test-spreadsheet.xlsx");
 		assertNotNull(p.asXMLDocument());
-	}	
-	
-  @Test
-  public void testJERMTemplatesParsableXLS() throws Exception {
-    URL resourceURL = WorkbookParserXMLTest.class
-        .getResource("/metabolites_intracellular.xls");
-    assertNotNull(resourceURL);
-    InputStream stream = resourceURL.openStream();
-    WorkbookParser p = new WorkbookParser(stream);
-    assertNotNull(p.asXML());
-  }
-  
-  @Test
-  public void testJERMTemplatesParsableXLSX() throws Exception {
-    URL resourceURL = WorkbookParserXMLTest.class
-        .getResource("/metabolites_intracellular.xls");
-    assertNotNull(resourceURL);
-    InputStream stream = resourceURL.openStream();
-    WorkbookParser p = new WorkbookParser(stream);
-    assertNotNull(p.asXML());
-  }
-
-	@Test
-	public void testConstructXLSX() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/test-spreadsheet.xlsx");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		new WorkbookParser(stream);
 	}
 
 	@Test
-	public void testvalidateXLSXXML() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/test-spreadsheet.xlsx");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
+	public void testJERMTemplatesParsableXLS() throws Exception {
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/metabolites_intracellular.xls");
 		String xml = p.asXML();
-		validateAgainstSchema(xml);
+		assertNotNull(xml);
+		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
 
-	private void validateAgainstSchema(String xml) throws Exception {
-		URL resource = WorkbookParserXMLTest.class.getResource("/schema-v1.xsd");
-		SAXReader reader = new SAXReader(true);
-		reader.setFeature("http://apache.org/xml/features/validation/schema",
-				true);
-		reader.setProperty(
-				"http://java.sun.com/xml/jaxp/properties/schemaLanguage",
-				"http://www.w3.org/2001/XMLSchema");
-		reader.setProperty(
-				"http://java.sun.com/xml/jaxp/properties/schemaSource",
-				new File(resource.getFile()));
-		InputSource source = new InputSource(new StringReader(xml));
-		source.setEncoding("UTF-8");
-		reader.read(source);
+	@Test
+	public void testJERMTemplatesParsableXLSX() throws Exception {
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/metabolites_intracellular.xlsx");
+		String xml = p.asXML();
+		assertNotNull(xml);
+		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
+
 }

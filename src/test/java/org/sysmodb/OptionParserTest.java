@@ -18,56 +18,56 @@ public class OptionParserTest {
 		args = new String[] { "-f", "fred.txt", "-o", "xml" };
 		p = new OptionParser(args);
 		assertEquals("xml", p.getOutputFormat());
-		assertEquals("fred.txt",p.getFilename());
-		
-		args = new String[] { "-f","fred.txt","-o","csv"};
-		p = new OptionParser(args);	
-		assertEquals("csv",p.getOutputFormat());
+		assertEquals("fred.txt", p.getFilename());
+
+		args = new String[] { "-f", "fred.txt", "-o", "csv" };
+		p = new OptionParser(args);
+		assertEquals("csv", p.getOutputFormat());
 	}
-	
+
 	@Test
 	public void testSheet() throws Exception {
-		String[] args = new String[] { "-o", "xml","-s","2" };
+		String[] args = new String[] { "-o", "xml", "-s", "2" };
 		OptionParser p = new OptionParser(args);
 		assertEquals("xml", p.getOutputFormat());
-		assertEquals(2,p.getSheet());
+		assertEquals(2, p.getSheet());
 	}
-	
+
 	@Test(expected = InvalidOptionException.class)
 	public void testBadSheet() throws Exception {
-		String[] args = new String[] { "-o", "xml","-s","a word" };
+		String[] args = new String[] { "-o", "xml", "-s", "a word" };
 		new OptionParser(args);
 	}
-	
+
 	@Test
 	public void testTrim() throws Exception {
-		String[] args = new String[] { "-o", "csv","-t" };
+		String[] args = new String[] { "-o", "csv", "-t" };
 		OptionParser p = new OptionParser(args);
 		assertEquals("csv", p.getOutputFormat());
 		assertTrue(p.getTrim());
-		
-		args = new String[] { "-o", "csv"};
+
+		args = new String[] { "-o", "csv" };
 		p = new OptionParser(args);
 		assertFalse(p.getTrim());
-		
-		args = new String[] {"-t", "-o", "csv"};
+
+		args = new String[] { "-t", "-o", "csv" };
 		p = new OptionParser(args);
 		assertTrue(p.getTrim());
 
-		args = new String[] {"-o", "csv","-s","1","-t"};
+		args = new String[] { "-o", "csv", "-s", "1", "-t" };
 		p = new OptionParser(args);
 		assertTrue(p.getTrim());
 	}
-	
+
 	public void testDefaultSheet() throws Exception {
 		String[] args = new String[] { "-o", "xml" };
-		OptionParser p = new OptionParser(args);		
-		//defaults to all with XML (indicated by -1)
-		assertEquals(-1,p.getSheet());
-		
-		args = new String[] {"-o","csv"};
-		p = new OptionParser(args);	
-		assertEquals(1,p.getSheet());
+		OptionParser p = new OptionParser(args);
+		// defaults to all with XML (indicated by -1)
+		assertEquals(-1, p.getSheet());
+
+		args = new String[] { "-o", "csv" };
+		p = new OptionParser(args);
+		assertEquals(1, p.getSheet());
 	}
 
 	@Test(expected = InvalidOptionException.class)
