@@ -81,7 +81,7 @@ public class PatchedPoi {
 									f1.getTokens(), workbook);
 							String formula2 = getStringFromPtgTokens(
 									f2.getTokens(), workbook);
-							if (!formula1.isEmpty() && !formula2.isEmpty()) {
+							if (!formula2.isEmpty()) {
 								int comparison = dvRecord.getConditionOperator();
 								DVConstraint dvConstraint = DVConstraint
 										.createNumericConstraint(validationType,
