@@ -53,6 +53,7 @@ public class SpreadsheetSuiteTest {
 		names.add("problematic_spreadsheet.xls");		
 		names.add("problematic_spreadsheet2.xls");
 		names.add("problematic_spreadsheet3.xls");
+		names.add("pride_template_empty.xls");
 		
 		return names;
 	}

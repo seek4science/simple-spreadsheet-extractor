@@ -81,13 +81,15 @@ public class PatchedPoi {
 									f1.getTokens(), workbook);
 							String formula2 = getStringFromPtgTokens(
 									f2.getTokens(), workbook);
-							int comparison = dvRecord.getConditionOperator();
-							DVConstraint dvConstraint = DVConstraint
-									.createNumericConstraint(validationType,
-											comparison, formula1, formula2);
-							HSSFDataValidation validation = new HSSFDataValidation(
-									cellRangeAddressList, dvConstraint);
-							dataValidation.add(validation);
+							if (!formula1.isEmpty() && !formula2.isEmpty()) {
+								int comparison = dvRecord.getConditionOperator();
+								DVConstraint dvConstraint = DVConstraint
+										.createNumericConstraint(validationType,
+												comparison, formula1, formula2);
+								HSSFDataValidation validation = new HSSFDataValidation(
+										cellRangeAddressList, dvConstraint);
+								dataValidation.add(validation);
+							}
 						}
 					}
 				}
