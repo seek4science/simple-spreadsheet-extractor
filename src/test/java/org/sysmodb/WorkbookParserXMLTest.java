@@ -57,6 +57,27 @@ public class WorkbookParserXMLTest {
 				.openSpreadsheetResource("/test-spreadsheet.xls");
 		assertNotNull(p.asXMLDocument());
 	}
+	
+	@Test
+	public void testNumberFormatting() throws Exception {
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/numbers_and_strings.xls");
+		Document doc = p.asXMLDocument();		
+		Namespace defNamespace = doc.getRootElement().getNamespace();
+		doc.getRootElement().addNamespace("bbb", defNamespace.getURI());
+		Map<String, String> namespaceURIs = new HashMap<String, String>();
+		namespaceURIs.put("bbb", defNamespace.getURI());
+		String [] expected = new String[]{"49","49","49","49.95","49.95","49.95"};
+		XPath xpath = DocumentHelper
+				.createXPath("//bbb:cell[@column_alpha='B']");
+		@SuppressWarnings("unchecked")
+		List<Node> nodes = xpath.selectNodes(doc);
+		int i=0;
+		for (Node node : nodes) {
+			String val = node.getStringValue();
+			assertEquals(expected[i++],val);
+		}
+	}
 
 	@Test
 	public void testColumnAlphaValues() throws Exception {
@@ -122,7 +143,7 @@ public class WorkbookParserXMLTest {
 		@SuppressWarnings("unchecked")
 		List<Node> matches = xpath.selectNodes(doc);
 		assertEquals(1, matches.size());
-		assertEquals("14.0", matches.get(0).getText());
+		assertEquals("14", matches.get(0).getText());
 	}
 
 	@Test

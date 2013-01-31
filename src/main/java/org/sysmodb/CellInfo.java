@@ -21,7 +21,7 @@ public class CellInfo {
 			value = "";
 			type = "blank";
 			formula = null;
-		} else {
+		} else {			
 			readCellValueAndType(cell.getCellType(),cell);			
 		}
 	}
@@ -42,7 +42,14 @@ public class CellInfo {
 				Date dateCellValue = cell.getDateCellValue();
 				value = dateFormatter.format(dateCellValue);
 			} else {
-				value = String.valueOf(cell.getNumericCellValue());
+				double numericValue = cell.getNumericCellValue();
+				int intValue = (int)numericValue;
+				if (intValue==numericValue) {
+					value = String.valueOf(intValue);
+				}
+				else {
+					value = String.valueOf(numericValue);
+				}				
 				type = "numeric";
 			}
 			break;
