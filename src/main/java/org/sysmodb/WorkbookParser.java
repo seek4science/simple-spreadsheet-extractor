@@ -395,14 +395,14 @@ public class WorkbookParser {
 		for (HSSFDataValidation validation : validationData) {
 			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {
 			String formula = validation.getValidationConstraint().getFormula1();
-                            if (formula!=null) {	
-                                    Element validationEl = validations.addElement("data_validation");
-                                    validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
-                                    validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
-                                    validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
-                                    validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));
-                                    validationEl.addElement("constraint").setText(formula);	
-                            }
+            if (formula!=null) {	
+                    Element validationEl = validations.addElement("data_validation");
+                    validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
+                    validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
+                    validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
+                    validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));
+                    validationEl.addElement("constraint").setText(formula);	
+            }
 		}
 	}
 	}
