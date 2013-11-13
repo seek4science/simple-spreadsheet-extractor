@@ -7,17 +7,17 @@
 	<description>Simple command line app that translates a Spreadsheet file to an XML document
 
 Now with style elements</description>
-        <version>0.12.1</version>
+        <version>0.13.03.03.0</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.sysmo-db</groupId>
 			<artifactId>rightfield-poi</artifactId>
-			<version>3.8</version>			
+			<version>3.9</version>			
 		</dependency>		
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.8</version>
+			<version>3.9</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.poi</groupId>
