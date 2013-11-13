@@ -199,11 +199,7 @@ public class WorkbookParserXMLTest {
 		WorkbookParser p = SpreadsheetTestHelper
 				.openSpreadsheetResource("/validated_spreadsheet.xls");
 		String xml = p.asXML();
-                assertNotNull(xml);	
-<<<<<<< HEAD
+                assertNotNull(xml);
                 SpreadsheetTestHelper.validateAgainstSchema(xml);
-=======
-         	SpreadsheetTestHelper.validateAgainstSchema(xml);	
->>>>>>> 12eb75607f343104e5eeb2ff0b439b2dc8a2362c
 	}
 }
