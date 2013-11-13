@@ -394,17 +394,17 @@ public class WorkbookParser {
 		List<HSSFDataValidation> validationData = PatchedPoi.getInstance().getValidationData(sheet, sheet.getWorkbook());
 		for (HSSFDataValidation validation : validationData) {
 			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {
-				Element validationEl = validations.addElement("data_validation");
-				validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
-				validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
-				validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
-				validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));		
-				String constraint = validation.getConstraint().getFormula1();
-                                if (constraint != null){ 
-                                    validationEl.addElement("constraint").setText(constraint);	
-                                    }
-			}			
+			String formula = validation.getValidationConstraint().getFormula1();
+                            if (formula!=null) {	
+                                    Element validationEl = validations.addElement("data_validation");
+                                    validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
+                                    validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
+                                    validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
+                                    validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));
+                                    validationEl.addElement("constraint").setText(formula);	
+                            }
 		}
+	}
 	}
 
 	private String column_alpha(int col) {
