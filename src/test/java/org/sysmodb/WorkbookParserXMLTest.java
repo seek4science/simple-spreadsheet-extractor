@@ -194,4 +194,11 @@ public class WorkbookParserXMLTest {
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
 
+        @Test
+	public void testValidatedSheet() throws Exception {
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/validated_spreadsheet.xls");
+		String xml = p.asXML();
+                assertNotNull(xml);		
+	}
 }

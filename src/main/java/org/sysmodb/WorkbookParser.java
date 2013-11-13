@@ -399,7 +399,10 @@ public class WorkbookParser {
 				validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
 				validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
 				validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));		
-				validationEl.addElement("constraint").setText(validation.getConstraint().getFormula1());			
+				String constraint = validation.getConstraint().getFormula1();
+                                if (constraint != null){ 
+                                    validationEl.addElement("constraint").setText(constraint);	
+                                    }
 			}			
 		}
 	}
