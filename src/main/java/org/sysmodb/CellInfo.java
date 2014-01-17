@@ -13,6 +13,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import org.apache.poi.ss.formula.FormulaParseException;
+
 public class CellInfo {
 	
 	private final static SimpleDateFormat dateFormatter = new SimpleDateFormat(
@@ -64,9 +66,14 @@ public class CellInfo {
 			type = "string";
 			break;
 		case Cell.CELL_TYPE_FORMULA:			
-			formula = cell.getCellFormula();
-			int resultCellType = cell.getCachedFormulaResultType();
-			readCellValueAndType(resultCellType,cell);			
+                       try {
+                            formula = cell.getCellFormula();
+                            int resultCellType = cell.getCachedFormulaResultType();
+                            readCellValueAndType(resultCellType,cell);	
+                       }
+                       catch(FormulaParseException e){
+                           
+                       }
 			break;
 		}
 	}
