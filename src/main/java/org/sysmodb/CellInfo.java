@@ -65,16 +65,15 @@ public class CellInfo {
 			value = cell.getStringCellValue();
 			type = "string";
 			break;
-		case Cell.CELL_TYPE_FORMULA:			
-                       try {
-                            formula = cell.getCellFormula();
-                            int resultCellType = cell.getCachedFormulaResultType();
-                            readCellValueAndType(resultCellType,cell);	
-                       }
-                       catch(FormulaParseException e){
-                           
-                       }
-			break;
+			case Cell.CELL_TYPE_FORMULA:
+				try {
+					formula = cell.getCellFormula();
+				} catch (FormulaParseException e) {
+
+				}
+				int resultCellType = cell.getCachedFormulaResultType();
+				readCellValueAndType(resultCellType, cell);
+				break;
 		}
 	}
 }

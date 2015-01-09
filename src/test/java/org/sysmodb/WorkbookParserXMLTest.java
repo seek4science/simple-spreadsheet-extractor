@@ -202,4 +202,16 @@ public class WorkbookParserXMLTest {
                 assertNotNull(xml);
                 SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
+
+        @Test
+        public void testUnknownFormulaSheet() throws Exception {
+		//This sheet has STDV.S formula which is known
+		//The parser throws error on the cells which the same formula is pulled down
+		//Happnes on MS excel 
+                WorkbookParser p = SpreadsheetTestHelper
+                                .openSpreadsheetResource("/unknown_formula.xlsx");
+                String xml = p.asXML();
+                assertNotNull(xml);
+                SpreadsheetTestHelper.validateAgainstSchema(xml);
+        }
 }
