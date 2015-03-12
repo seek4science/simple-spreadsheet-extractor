@@ -25,7 +25,7 @@ public class ExtractorMain {
 				workbook.asXML(new OutputStreamWriter(System.out));
 			}
 			if (options.getOutputFormat().equals("csv")) {
-				System.out.println(workbook.asCSV(options.getSheet(),options.getTrim()));
+				workbook.asCSV(new OutputStreamWriter(System.out),options.getSheet(),options.getTrim());
 			}
 					
 		} catch (IOException e) {

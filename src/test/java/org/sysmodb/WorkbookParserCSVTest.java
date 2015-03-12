@@ -17,25 +17,9 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-public class WorkbookParserCSVTest {
-
-	@Test
-	@Ignore("Problem with the test rather than what it is testing. Seems to be a charset problem")
-	public void testAsCSV() throws Exception {
-		URL resourceURL = WorkbookParserCSVTest.class
-				.getResource("/test-spreadsheet-for-csv.xls");
-		assertNotNull(resourceURL);
-		InputStream stream = resourceURL.openStream();
-		WorkbookParser p = new WorkbookParser(stream);
-		String csv = p.asCSV(1);
-		assertNotNull(csv);
-
-		String expectedResult = expectedResult("/test-spreadsheet-for-csv.csv");
-		assertEquals(expectedResult, csv);
-	}
+public class WorkbookParserCSVTest {	
 
 	@Test
 	public void testAsCSVAnotherSheet() throws Exception {
