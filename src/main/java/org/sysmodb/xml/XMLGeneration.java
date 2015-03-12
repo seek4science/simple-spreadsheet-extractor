@@ -54,28 +54,28 @@ public class XMLGeneration {
 	}
 	
 	public void outputToWriter(Writer outputWriter) throws IOException, XMLStreamException {
-			
-		
-        //writer.write(asXMLDocument());
-		//messingabout(outputWriter);
+					       
 		XMLOutputFactory factory      = XMLOutputFactory.newInstance();		
 		XMLStreamWriter xmlwriter  = factory.createXMLStreamWriter(outputWriter);
 		xmlwriter.writeStartDocument();
 		streamXML(xmlwriter);
 		xmlwriter.writeEndDocument();
-		
-		
+				
 		xmlwriter.flush();
-		xmlwriter.close();
-		
-		
+		xmlwriter.close();				
 	}		
 	
 	private void streamXML(XMLStreamWriter xmlWriter) throws XMLStreamException {
 		xmlWriter.writeStartElement("workbook");
 		xmlWriter.writeDefaultNamespace("http://www.sysmo-db.org/2010/xml/spreadsheet");
 		writeNamedRanged(xmlWriter);
+		writeStyles(xmlWriter);
 		writeSheets(xmlWriter);
+		xmlWriter.writeEndElement();
+	}
+	
+	private void writeStyles(XMLStreamWriter xmlWriter) throws XMLStreamException {
+		xmlWriter.writeStartElement("styles");
 		xmlWriter.writeEndElement();
 	}
 	
@@ -97,17 +97,104 @@ public class XMLGeneration {
 				String.valueOf(poiWorkbook.isSheetVeryHidden(sheetIndex)));
 		
 		
-		//write data validation
+		writeDataValidations(xmlWriter,sheet);
 		
 		writeColumns(xmlWriter,sheet);
 		
 		writeRows(xmlWriter, sheet);
 		
-		
-		
-		
 		xmlWriter.writeEndElement();		
 		
+	}
+	
+	private void writeDataValidations(XMLStreamWriter xmlWriter, Sheet sheet) throws XMLStreamException {
+		xmlWriter.writeStartElement("data_validations");
+		if (sheet instanceof HSSFSheet) {
+			writeHSSFDataValidations(xmlWriter,(HSSFSheet)sheet);
+		}
+		else {
+			writeXSSFDataValidations(xmlWriter,(XSSFSheet)sheet);			
+		}
+		xmlWriter.writeEndElement();
+	}
+	
+	private void writeHSSFDataValidations(XMLStreamWriter xmlWriter,HSSFSheet sheet) throws XMLStreamException {
+		List<HSSFDataValidation> validationData = PatchedPoi.getInstance().getValidationData(sheet, sheet.getWorkbook());
+		for (HSSFDataValidation validation : validationData) {
+			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {
+			String formula = validation.getValidationConstraint().getFormula1();
+            if (formula!=null) {	
+                    //writeDataValidation(xmlWriter, address, formula);
+            }
+		}
+	}
+	}
+
+	private void writeDataValidation(XMLStreamWriter xmlWriter,
+			CellRangeAddress address, String formula) throws XMLStreamException {
+		xmlWriter.writeStartElement("data_validation");
+		xmlWriter.writeAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
+		xmlWriter.writeAttribute("last_column",String.valueOf(address.getLastColumn()+1));
+		xmlWriter.writeAttribute("first_row",String.valueOf(address.getFirstRow()+1));
+		xmlWriter.writeAttribute("last_row",String.valueOf(address.getLastRow()+1));
+		xmlWriter.writeStartElement("constraint");
+		xmlWriter.writeCharacters(formula);
+		xmlWriter.writeEndElement();
+		xmlWriter.writeEndElement();
+	}
+	private void writeXSSFDataValidations(XMLStreamWriter xmlWriter,XSSFSheet sheet) throws XMLStreamException {
+		List<XSSFDataValidation> validationData = sheet.getDataValidations();
+		for (XSSFDataValidation validation : validationData) {
+			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {				
+				String formula = validation.getValidationConstraint().getFormula1();
+				if (formula!=null) {
+					writeDataValidation(xmlWriter, address, formula);
+				}						
+			}			
+		}
+	}
+	
+	private void dataValidationsToXML(Element validations, Sheet sheet) {
+		if (sheet instanceof HSSFSheet) {
+			hssfDataValidationsToXML(validations,(HSSFSheet)sheet);
+		}
+		else {
+			xssfDataValidationsToXML(validations,(XSSFSheet)sheet);
+		}		
+	}
+
+	private void xssfDataValidationsToXML(Element validations, XSSFSheet sheet) {
+		List<XSSFDataValidation> validationData = sheet.getDataValidations();
+		for (XSSFDataValidation validation : validationData) {
+			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {				
+				String formula = validation.getValidationConstraint().getFormula1();
+				if (formula!=null) {
+					Element validationEl = validations.addElement("data_validation");
+					validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
+					validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
+					validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
+					validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));					
+					validationEl.addElement("constraint").setText(formula);
+				}						
+			}			
+		}
+	}
+
+	private void hssfDataValidationsToXML(Element validations, HSSFSheet sheet) {
+		List<HSSFDataValidation> validationData = PatchedPoi.getInstance().getValidationData(sheet, sheet.getWorkbook());
+		for (HSSFDataValidation validation : validationData) {
+			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {
+			String formula = validation.getValidationConstraint().getFormula1();
+            if (formula!=null) {	
+                    Element validationEl = validations.addElement("data_validation");
+                    validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
+                    validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
+                    validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
+                    validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));
+                    validationEl.addElement("constraint").setText(formula);	
+            }
+		}
+	}
 	}
 	
 	private void writeColumns(XMLStreamWriter xmlWriter, Sheet sheet) throws XMLStreamException {
@@ -167,7 +254,7 @@ public class XMLGeneration {
 		
 	private void writeRow(XMLStreamWriter xmlWriter, int index, Row row, Sheet sheet) throws XMLStreamException {
 		xmlWriter.writeStartElement("row");
-		xmlWriter.writeAttribute("index",String.valueOf(index));
+		xmlWriter.writeAttribute("index",String.valueOf(index+1));
 		if (sheet.getDefaultRowHeightInPoints() != row.getHeightInPoints()) {
 			xmlWriter.writeAttribute("height","" + row.getHeightInPoints() + "pt");			
 		}
@@ -498,48 +585,7 @@ public class XMLGeneration {
 
 	
 
-	private void dataValidationsToXML(Element validations, Sheet sheet) {
-		if (sheet instanceof HSSFSheet) {
-			hssfDataValidationsToXML(validations,(HSSFSheet)sheet);
-		}
-		else {
-			xssfDataValidationsToXML(validations,(XSSFSheet)sheet);
-		}		
-	}
-
-	private void xssfDataValidationsToXML(Element validations, XSSFSheet sheet) {
-		List<XSSFDataValidation> validationData = sheet.getDataValidations();
-		for (XSSFDataValidation validation : validationData) {
-			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {				
-				String formula = validation.getValidationConstraint().getFormula1();
-				if (formula!=null) {
-					Element validationEl = validations.addElement("data_validation");
-					validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
-					validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
-					validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
-					validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));					
-					validationEl.addElement("constraint").setText(formula);
-				}						
-			}			
-		}
-	}
-
-	private void hssfDataValidationsToXML(Element validations, HSSFSheet sheet) {
-		List<HSSFDataValidation> validationData = PatchedPoi.getInstance().getValidationData(sheet, sheet.getWorkbook());
-		for (HSSFDataValidation validation : validationData) {
-			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {
-			String formula = validation.getValidationConstraint().getFormula1();
-            if (formula!=null) {	
-                    Element validationEl = validations.addElement("data_validation");
-                    validationEl.addAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
-                    validationEl.addAttribute("last_column",String.valueOf(address.getLastColumn()+1));
-                    validationEl.addAttribute("first_row",String.valueOf(address.getFirstRow()+1));
-                    validationEl.addAttribute("last_row",String.valueOf(address.getLastRow()+1));
-                    validationEl.addElement("constraint").setText(formula);	
-            }
-		}
-	}
-	}
+	
 
 	private String column_alpha(int col) {
 		String result = "";

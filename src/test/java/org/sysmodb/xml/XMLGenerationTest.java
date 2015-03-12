@@ -137,7 +137,7 @@ public class XMLGenerationTest {
 	private Document convertToXMLDocument(XMLGeneration generator) throws IOException, DocumentException, XMLStreamException {
 		StringWriter out = new StringWriter();
 		generator.outputToWriter(out);
-		System.out.println(out.toString());		
+		//System.out.println(out.toString());		
 		return DocumentHelper.parseText(out.toString());
 		
 	}
