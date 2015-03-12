@@ -4,7 +4,7 @@
  * Licensed under the New BSD License. 
  * Please see LICENSE file that is distributed with the source code
  ******************************************************************************/
-package org.sysmodb;
+package org.sysmodb.xml;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -21,7 +21,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
  * @author Finn, Stuart Owen
  */
 
-public class HSSFStyleHelper implements StyleHelper {
+public class HSSFXMLStyleHelper implements XMLStyleHelper {
 
   private static HSSFWorkbook workbook;
   private static HSSFPalette palette;
@@ -29,7 +29,7 @@ public class HSSFStyleHelper implements StyleHelper {
   private static final HSSFColor HSSF_AUTO = new HSSFColor.AUTOMATIC();
 
 
-  public HSSFStyleHelper(HSSFWorkbook wb)
+  public HSSFXMLStyleHelper(HSSFWorkbook wb)
   {
     workbook = wb;
     palette = wb.getCustomPalette();

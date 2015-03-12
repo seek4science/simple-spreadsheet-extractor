@@ -25,24 +25,20 @@ import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.sysmodb.CellInfo;
-import org.sysmodb.HSSFStyleHelper;
 import org.sysmodb.PatchedPoi;
-import org.sysmodb.StyleGenerator;
-import org.sysmodb.StyleHelper;
-import org.sysmodb.XSSFStyleHelper;
 
 public class XMLGeneration {
 	
 	private final Workbook poiWorkbook;
-	private StyleHelper styleHelper = null;
+	private XMLStyleHelper styleHelper = null;
 	private List<CellStyle> styles = new ArrayList<CellStyle>();	
 
 	public XMLGeneration(Workbook poiWorkbook) {
 		this.poiWorkbook = poiWorkbook;	
 		if (poiWorkbook instanceof XSSFWorkbook) {
-			styleHelper = new XSSFStyleHelper();
+			styleHelper = new XSSFXMLStyleHelper();
 		} else {
-			styleHelper = new HSSFStyleHelper((HSSFWorkbook) poiWorkbook);			
+			styleHelper = new HSSFXMLStyleHelper((HSSFWorkbook) poiWorkbook);			
 		}
 	}
 	
@@ -295,7 +291,7 @@ public class XMLGeneration {
 		gatherStyles();
 		for (CellStyle style : styles) {
 			if (style!=null) {
-				StyleGenerator.writeStyle(xmlWriter,style,styleHelper);
+				XMLStyleGenerator.writeStyle(xmlWriter,style,styleHelper);
 			}
 		}
 		
@@ -323,7 +319,7 @@ public class XMLGeneration {
 	}
 	
 	private boolean isStyleEmpty(CellStyle style) {
-		return StyleGenerator.isStyleEmpty(style, styleHelper);
+		return XMLStyleGenerator.isStyleEmpty(style, styleHelper);
 	}
 
 	private String column_alpha(int col) {

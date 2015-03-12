@@ -4,7 +4,7 @@
  * Licensed under the New BSD License. 
  * Please see LICENSE file that is distributed with the source code
  ******************************************************************************/
-package org.sysmodb;
+package org.sysmodb.xml;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -15,7 +15,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
  *
  * @author Finn, Stuart Owen
  */
-public interface StyleHelper {
+public interface XMLStyleHelper {
 
     String getBGColour(CellStyle style);    
     

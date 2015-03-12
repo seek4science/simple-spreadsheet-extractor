@@ -4,7 +4,7 @@
  * Licensed under the New BSD License. 
  * Please see LICENSE file that is distributed with the source code
  ******************************************************************************/
-package org.sysmodb;
+package org.sysmodb.xml;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
  *
  * @author Finn
  */
-public abstract class StyleGenerator {
+public abstract class XMLStyleGenerator {
   private static final Map<Short, String> BORDERS = createBorderMap();
 
   private static Map<Short, String> createBorderMap() {
@@ -42,7 +42,7 @@ public abstract class StyleGenerator {
     return Collections.unmodifiableMap(result);
   }
 
-  public static boolean isStyleEmpty(CellStyle style,StyleHelper helper) {
+  public static boolean isStyleEmpty(CellStyle style,XMLStyleHelper helper) {
 	  
 	  if(BORDERS.get(style.getBorderTop()) != "none")
 	      return false;
@@ -60,7 +60,7 @@ public abstract class StyleGenerator {
 	    return helper.areFontsEmpty(style);	    
   }
   
-  public static void writeStyle(XMLStreamWriter xmlWriter, CellStyle style, StyleHelper helper) throws XMLStreamException {
+  public static void writeStyle(XMLStreamWriter xmlWriter, CellStyle style, XMLStyleHelper helper) throws XMLStreamException {
 	  String border = "none";
 	  xmlWriter.writeStartElement("style");
 	  xmlWriter.writeAttribute("id", "style"+style.getIndex());
