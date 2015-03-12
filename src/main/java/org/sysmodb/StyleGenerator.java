@@ -14,7 +14,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.dom4j.Element;
 
 /**
  *
@@ -104,31 +103,5 @@ public abstract class StyleGenerator {
 	    
 	      
   }
-  
-  public static void createStyle(CellStyle style, Element element, StyleHelper helper)
-  {
-    //Border properties
-    String border = "none";
-    if((border = BORDERS.get(style.getBorderTop())) != "none")
-      element.addElement("border-top").addText(border);
-    if((border = BORDERS.get(style.getBorderBottom())) != "none")
-      element.addElement("border-bottom").addText(border);
-    if((border = BORDERS.get(style.getBorderLeft())) != "none")
-      element.addElement("border-left").addText(border);
-    if((border = BORDERS.get(style.getBorderRight())) != "none")
-      element.addElement("border-right").addText(border);
-  
-    //Background/fill colour
-    String backgroundColour;
-    if((backgroundColour = helper.getBGColour(style)) != null)
-      element.addElement("background-color").addText(backgroundColour);
     
-    //Font properties
-    helper.setFontProperties(style, element);
-  }
-  
-  public static int getStyleHash(Element element)
-  {
-    return element.asXML().replaceAll("style([0-9]+)","").hashCode();
-  }
 }

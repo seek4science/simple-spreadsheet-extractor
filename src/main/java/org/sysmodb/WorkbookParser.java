@@ -39,20 +39,24 @@ public class WorkbookParser {
 		poiWorkbook = WorkbookFactory.create(stream);
 		
 	}
-
+	
 	public String asXML() {
 		Writer out = new StringWriter();
+		asXML(out);
+		return out.toString();
+	}
+	
+	public void asXML(Writer out) {
+		
 		XMLGeneration generator = new XMLGeneration(poiWorkbook);
 		try {
 			generator.outputToWriter(out);
 		} catch (IOException e) {			
-			e.printStackTrace();
-			return null;
+			e.printStackTrace();			
 		} catch (XMLStreamException e) {
-			e.printStackTrace();
-			return null;
+			e.printStackTrace();			
 		} 
-		return out.toString();
+		
 	}
 
 	public String asCSV(int sheetIndex) {

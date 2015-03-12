@@ -46,7 +46,7 @@ public class SpreadsheetTestHelper {
 			reader.read(source);
 		}
 		catch(DocumentException e) {
-			System.out.println(xml);
+			//System.out.println(xml);
 			throw e;
 		}
 		

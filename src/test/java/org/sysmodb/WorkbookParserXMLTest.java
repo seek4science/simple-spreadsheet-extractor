@@ -48,7 +48,6 @@ public class WorkbookParserXMLTest {
 		System.out.println(xml);
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
-
 	
 	@Test
 	public void testAsXMLForXLSX() throws Exception {

@@ -10,17 +10,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.dom4j.Element;
 
  /**
  *
- * @author Finn
+ * @author Finn, Stuart Owen
  */
 public interface StyleHelper {
 
-    String getBGColour(CellStyle style);
-
-    void setFontProperties(CellStyle style, Element element);
+    String getBGColour(CellStyle style);    
     
     boolean areFontsEmpty(CellStyle style);
     

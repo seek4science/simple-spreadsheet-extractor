@@ -15,11 +15,10 @@ import org.apache.poi.hssf.usermodel.HSSFPalette;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.dom4j.Element;
 
 /**
  *
- * @author Finn
+ * @author Finn, Stuart Owen
  */
 
 public class HSSFStyleHelper implements StyleHelper {
@@ -101,26 +100,7 @@ public class HSSFStyleHelper implements StyleHelper {
 	    }
   	
   }
-
-  public void setFontProperties(CellStyle style, Element element)
-  {
-    HSSFCellStyle newStyle = (HSSFCellStyle) style;
-    HSSFFont font = newStyle.getFont(workbook);
-    if(font.getBoldweight() == HSSFFont.BOLDWEIGHT_BOLD)
-      element.addElement("font-weight").addText("bold");
-    if(font.getItalic())
-      element.addElement("font-style").addText("italics");
-    if(font.getUnderline() != HSSFFont.U_NONE)
-      element.addElement("text-decoration").addText("underline");
-    //Ignore same-ish defaults
-    if(font.getFontHeightInPoints() != 10 && font.getFontHeightInPoints() != 11)
-      element.addElement("font-size").addText(String.valueOf(font.getFontHeightInPoints() + "pt"));
-    //Arial is default for Excel, Calibri is default for OO
-    if(!font.getFontName().equals("Arial") && !font.getFontName().equals("Calibri"))
-      element.addElement("font-family").addText(font.getFontName());
-    if((font.getColor() != HSSFFont.COLOR_NORMAL) && (getRGBString(font.getColor()) != null) && !getRGBString(font.getColor()).equals("#000"))            
-      element.addElement("color").addText(getRGBString(font.getColor()));
-  }
+  
 
   private String getRGBString(short index)
   {

@@ -8,6 +8,7 @@ package org.sysmodb;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -21,7 +22,7 @@ public class ExtractorMain {
 		try {
 			WorkbookParser workbook = new WorkbookParser(getInputStream());
 			if (options.getOutputFormat().equals("xml")) {
-				System.out.println(workbook.asXML());
+				workbook.asXML(new OutputStreamWriter(System.out));
 			}
 			if (options.getOutputFormat().equals("csv")) {
 				System.out.println(workbook.asCSV(options.getSheet(),options.getTrim()));
