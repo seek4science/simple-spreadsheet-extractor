@@ -24,7 +24,12 @@ Now with style elements</description>
 					<artifactId>poi</artifactId>					
 					</exclusion>
 			</exclusions>
-		</dependency>		
+		</dependency>	
+		<dependency>
+			<groupId>dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>1.6.1</version>			
+		</dependency>	
 		
 		<!--  TEST ONLY -->
 		<dependency>
@@ -38,13 +43,7 @@ Now with style elements</description>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-			<version>1.6.1</version>
-			<scope>test</scope>
-		</dependency>
+		</dependency>		
 	</dependencies>
 	<repositories>
 	  <repository>
