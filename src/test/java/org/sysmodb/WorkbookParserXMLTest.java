@@ -44,8 +44,7 @@ public class WorkbookParserXMLTest {
 	public void testValidateXLSWithComplexValidations() throws Exception {
 		WorkbookParser p = SpreadsheetTestHelper
 				.openSpreadsheetResource("/complex_validations.xls");
-		String xml = p.asXML();
-		System.out.println(xml);
+		String xml = p.asXML();		
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
 	
