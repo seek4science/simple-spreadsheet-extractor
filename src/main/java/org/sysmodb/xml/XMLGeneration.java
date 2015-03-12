@@ -46,8 +46,7 @@ public class XMLGeneration {
 		}
 	}
 	
-	public void outputToWriter(Writer outputWriter) throws IOException, XMLStreamException {
-					       
+	public void outputToWriter(Writer outputWriter) throws IOException, XMLStreamException {					       
 		XMLOutputFactory factory      = XMLOutputFactory.newInstance();		
 		XMLStreamWriter xmlwriter  = factory.createXMLStreamWriter(outputWriter);
 		xmlwriter.writeStartDocument();
@@ -148,8 +147,6 @@ public class XMLGeneration {
 		}
 	}
 	
-	
-	
 	private void writeColumns(XMLStreamWriter xmlWriter, Sheet sheet) throws XMLStreamException {
 		int firstCol = 1;
 		int lastCol = 1;
@@ -240,7 +237,7 @@ public class XMLGeneration {
 					}
 					
 					if (info.formula != null) {
-						xmlWriter.writeAttribute("formula", info.formula);
+						xmlWriter.writeAttribute("formula", stripControlCharacters(info.formula));
 					}
 					xmlWriter.writeCharacters(info.value);
 					xmlWriter.writeEndElement();
@@ -249,9 +246,6 @@ public class XMLGeneration {
 			}
 		}
 	}
-	
-	
-		
 	
 	private void writeNamedRanged(XMLStreamWriter xmlWriter) throws XMLStreamException {
 		xmlWriter.writeStartElement("named_ranges");
@@ -282,7 +276,7 @@ public class XMLGeneration {
                     xmlWriter.writeEndElement();
                     
                     xmlWriter.writeStartElement("refers_to_formula");
-                    xmlWriter.writeCharacters(formula);
+                    xmlWriter.writeCharacters(stripControlCharacters(formula));
                     xmlWriter.writeEndElement();
                     
                     xmlWriter.writeEndElement();                                                                              
@@ -346,4 +340,7 @@ public class XMLGeneration {
 		return poiWorkbook;
 	}
 
+	private String stripControlCharacters(String original) {
+		return original.replaceAll("\\p{Cntrl}", "");
+	}
 }

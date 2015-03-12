@@ -26,7 +26,7 @@ import org.junit.Test;
 public class SpreadsheetSuiteTest {
 	private final String ROOT = "spreadsheet_suite";
 	private static final Logger logger = Logger.getLogger("SpreadsheetSuiteTest");
-	private final boolean FAIL_QUIETLY = false;
+	private final boolean FAIL_QUIETLY = true;
 
 	/**
 	 * Tests each spreadsheet resource defined by
@@ -36,6 +36,7 @@ public class SpreadsheetSuiteTest {
 	public void testAll() throws Exception {
 
 		for (String name : getSpreadsheetResourceNames()) {
+			System.out.println(name);
 			try {
 				URL resourceURL = WorkbookParserXMLTest.class.getResource("/"
 						+ ROOT + "/" + name);
@@ -47,7 +48,7 @@ public class SpreadsheetSuiteTest {
 			}
 			catch(Exception e) {
 				logger.severe("Error parsing "+name+" - "+e.getMessage());
-				if (!FAIL_QUIETLY) {
+				if (!FAIL_QUIETLY) {					
 					throw e;
 				}
 			}			

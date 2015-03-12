@@ -57,7 +57,6 @@ public class WorkbookParserXMLTest {
 		SpreadsheetTestHelper.validateAgainstSchema(p.asXML());
 	}
 	
-
 	@Test
 	public void testJERMTemplatesParsableXLS() throws Exception {
 		WorkbookParser p = SpreadsheetTestHelper
