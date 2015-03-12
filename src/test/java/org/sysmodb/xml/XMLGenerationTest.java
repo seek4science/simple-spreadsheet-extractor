@@ -17,6 +17,8 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Namespace;
 import org.dom4j.Node;
 import org.dom4j.XPath;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import org.junit.Test;
 import org.sysmodb.SpreadsheetTestHelper;
 import org.sysmodb.WorkbookParser;
@@ -137,8 +139,27 @@ public class XMLGenerationTest {
 	private Document convertToXMLDocument(XMLGeneration generator) throws IOException, DocumentException, XMLStreamException {
 		StringWriter out = new StringWriter();
 		generator.outputToWriter(out);
-		//System.out.println(out.toString());		
-		return DocumentHelper.parseText(out.toString());
+		Document document = DocumentHelper.parseText(out.toString());
+		//printOutXML(document);		
+		return document;		
+	}
+	
+	private void printOutXML(Document document) {
+		StringWriter out = new StringWriter();
+		OutputFormat format = OutputFormat.createPrettyPrint();
+		format.setEncoding("UTF-8");		
+		XMLWriter writer = new XMLWriter(out, format);
 		
+		writer.setEscapeText(true);						
+		
+		try {			
+			writer.write(document);
+			writer.close();
+			System.out.println(out.toString());
+		} catch (IOException e) {
+			// should never get here, since we are using a StringWriter rather
+			// than IO based Writer
+			e.printStackTrace();			
+		}
 	}
 }

@@ -6,6 +6,9 @@
  ******************************************************************************/
 package org.sysmodb;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFPalette;
@@ -36,6 +39,67 @@ public class HSSFStyleHelper implements StyleHelper {
   public String getBGColour(CellStyle style)
   {
     return getRGBString(style.getFillForegroundColor());
+  }
+  
+  public boolean areFontsEmpty(CellStyle style) {
+	  HSSFCellStyle newStyle = (HSSFCellStyle) style;
+	    HSSFFont font = newStyle.getFont(workbook);
+	    if(font.getBoldweight() == HSSFFont.BOLDWEIGHT_BOLD)
+	      return false;
+	    if(font.getItalic())
+	    	return false;
+	    if(font.getUnderline() != HSSFFont.U_NONE)
+	    	return false;
+	    //Ignore same-ish defaults
+	    if(font.getFontHeightInPoints() != 10 && font.getFontHeightInPoints() != 11)
+	    	return false;
+	    //Arial is default for Excel, Calibri is default for OO
+	    if(!font.getFontName().equals("Arial") && !font.getFontName().equals("Calibri"))
+	    	return false;
+	    if((font.getColor() != HSSFFont.COLOR_NORMAL) && (getRGBString(font.getColor()) != null) && !getRGBString(font.getColor()).equals("#000"))            
+	    	return false;
+	    
+	    return true;
+  }
+  
+  @Override
+  public void writeFontProperties(XMLStreamWriter xmlWriter, CellStyle style)
+  		throws XMLStreamException {
+	  HSSFCellStyle newStyle = (HSSFCellStyle) style;
+	    HSSFFont font = newStyle.getFont(workbook);
+	    if(font.getBoldweight() == HSSFFont.BOLDWEIGHT_BOLD) {
+	    	xmlWriter.writeStartElement("font-weight");
+	    	xmlWriter.writeCharacters("bold");
+	    	xmlWriter.writeEndElement();	      
+	    }
+	    if(font.getItalic()) {
+	    	xmlWriter.writeStartElement("font-style");
+	    	xmlWriter.writeCharacters("italics");
+	    	xmlWriter.writeEndElement();	      
+	    }
+	    if(font.getUnderline() != HSSFFont.U_NONE) {
+	    	xmlWriter.writeStartElement("text-decoration");
+	    	xmlWriter.writeCharacters("underline");
+	    	xmlWriter.writeEndElement();	      
+	    }
+	    //Ignore same-ish defaults
+	    if(font.getFontHeightInPoints() != 10 && font.getFontHeightInPoints() != 11) {
+	    	xmlWriter.writeStartElement("font-size");
+	    	xmlWriter.writeCharacters(String.valueOf(font.getFontHeightInPoints() + "pt"));
+	    	xmlWriter.writeEndElement();	      
+	    }
+	    //Arial is default for Excel, Calibri is default for OO
+	    if(!font.getFontName().equals("Arial") && !font.getFontName().equals("Calibri")) {
+	    	xmlWriter.writeStartElement("font-family");
+	    	xmlWriter.writeCharacters(font.getFontName());
+	    	xmlWriter.writeEndElement();	      
+	    }
+	    if((font.getColor() != HSSFFont.COLOR_NORMAL) && (getRGBString(font.getColor()) != null) && !getRGBString(font.getColor()).equals("#000")) { 
+	    	xmlWriter.writeStartElement("color");
+	    	xmlWriter.writeCharacters(getRGBString(font.getColor()));
+	    	xmlWriter.writeEndElement();	      
+	    }
+  	
   }
 
   public void setFontProperties(CellStyle style, Element element)
@@ -84,4 +148,6 @@ public class HSSFStyleHelper implements StyleHelper {
 
     return string;
   }
+
+
 }

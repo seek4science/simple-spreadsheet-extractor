@@ -43,6 +43,7 @@ public class XMLGeneration {
 	
 	private final Workbook poiWorkbook;
 	private StyleHelper styleHelper = null;
+	private List<CellStyle> styles = new ArrayList<CellStyle>();	
 
 	public XMLGeneration(Workbook poiWorkbook) {
 		this.poiWorkbook = poiWorkbook;	
@@ -73,11 +74,7 @@ public class XMLGeneration {
 		writeSheets(xmlWriter);
 		xmlWriter.writeEndElement();
 	}
-	
-	private void writeStyles(XMLStreamWriter xmlWriter) throws XMLStreamException {
-		xmlWriter.writeStartElement("styles");
-		xmlWriter.writeEndElement();
-	}
+		
 	
 	private void writeSheets(XMLStreamWriter xmlWriter) throws XMLStreamException {
 		
@@ -118,16 +115,20 @@ public class XMLGeneration {
 		xmlWriter.writeEndElement();
 	}
 	
-	private void writeHSSFDataValidations(XMLStreamWriter xmlWriter,HSSFSheet sheet) throws XMLStreamException {
-		List<HSSFDataValidation> validationData = PatchedPoi.getInstance().getValidationData(sheet, sheet.getWorkbook());
+	private void writeHSSFDataValidations(XMLStreamWriter xmlWriter,
+			HSSFSheet sheet) throws XMLStreamException {
+		List<HSSFDataValidation> validationData = PatchedPoi.getInstance()
+				.getValidationData(sheet, sheet.getWorkbook());
 		for (HSSFDataValidation validation : validationData) {
-			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {
-			String formula = validation.getValidationConstraint().getFormula1();
-            if (formula!=null) {	
-                    //writeDataValidation(xmlWriter, address, formula);
-            }
+			for (CellRangeAddress address : validation.getRegions()
+					.getCellRangeAddresses()) {
+				String formula = validation.getValidationConstraint()
+						.getFormula1();
+				if (formula != null) {
+					writeDataValidation(xmlWriter, address, formula);
+				}
+			}
 		}
-	}
 	}
 
 	private void writeDataValidation(XMLStreamWriter xmlWriter,
@@ -142,6 +143,7 @@ public class XMLGeneration {
 		xmlWriter.writeEndElement();
 		xmlWriter.writeEndElement();
 	}
+	
 	private void writeXSSFDataValidations(XMLStreamWriter xmlWriter,XSSFSheet sheet) throws XMLStreamException {
 		List<XSSFDataValidation> validationData = sheet.getDataValidations();
 		for (XSSFDataValidation validation : validationData) {
@@ -280,26 +282,18 @@ public class XMLGeneration {
 					xmlWriter.writeAttribute("row",
 							String.valueOf(row.getRowNum() + 1));
 					xmlWriter.writeAttribute("type", info.type);
+					
+					int styleIndex = cell.getCellStyle().getIndex();
+					if (styles.get(styleIndex)!=null) {
+						xmlWriter.writeAttribute("style", "style"+cell.getCellStyle().getIndex());
+					}
+					
 					if (info.formula != null) {
 						xmlWriter.writeAttribute("formula", info.formula);
 					}
 					xmlWriter.writeCharacters(info.value);
 					xmlWriter.writeEndElement();
 
-					// Cell style
-					// Add to style linked list
-//					int styleIndex = cell.getCellStyle().getIndex();
-//
-//					styleMap.get(styleIndex).add(cellElement);
-//					cellElement.addAttribute("style",
-//							("style" + cell.getCellStyle()
-//									.getIndex()));
-//
-//					if (info.formula != null) {
-//						cellElement.addAttribute("formula",
-//								info.formula);
-//					}
-//					cellElement.setText(info.value);
 				}
 			}
 		}
@@ -467,6 +461,42 @@ public class XMLGeneration {
 		describeStyles(stylesElement, styleMap);		
 
 		return doc;
+	}
+	
+	private void writeStyles(XMLStreamWriter xmlWriter) throws XMLStreamException {
+		xmlWriter.writeStartElement("styles");
+		gatherStyles();
+		for (CellStyle style : styles) {
+			if (style!=null) {
+				StyleGenerator.writeStyle(xmlWriter,style,styleHelper);
+			}
+		}
+		
+		xmlWriter.writeEndElement();
+	}
+	
+	private void gatherStyles() {
+		for (short i = 0; i<getWorkbook().getNumCellStyles();i++) {			
+			try {
+				CellStyle style = getWorkbook().getCellStyleAt(i);
+				if (isStyleEmpty(style)) {
+					styles.add(i, null);
+				}
+				else {
+					styles.add(i, style);
+				}
+			}
+			// Sometimes XSLX messes up and reports wrong number of
+			// styles...
+			catch (IndexOutOfBoundsException e) {
+				styles.add(i,null);
+				break;
+			}			
+		}		
+	}
+	
+	private boolean isStyleEmpty(CellStyle style) {
+		return StyleGenerator.isStyleEmpty(style, styleHelper);
 	}
 
 	private void describeStyles(Element stylesElement,

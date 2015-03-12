@@ -6,6 +6,9 @@
  ******************************************************************************/
 package org.sysmodb;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.dom4j.Element;
 
@@ -18,4 +21,8 @@ public interface StyleHelper {
     String getBGColour(CellStyle style);
 
     void setFontProperties(CellStyle style, Element element);
+    
+    boolean areFontsEmpty(CellStyle style);
+    
+    void writeFontProperties(XMLStreamWriter xmlWriter, CellStyle style) throws XMLStreamException;
 }

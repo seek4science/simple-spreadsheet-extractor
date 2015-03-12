@@ -10,6 +10,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.dom4j.Element;
 
@@ -40,6 +43,68 @@ public abstract class StyleGenerator {
     return Collections.unmodifiableMap(result);
   }
 
+  public static boolean isStyleEmpty(CellStyle style,StyleHelper helper) {
+	  
+	  if(BORDERS.get(style.getBorderTop()) != "none")
+	      return false;
+	    if(BORDERS.get(style.getBorderBottom()) != "none")
+	    	return false;
+	    if(BORDERS.get(style.getBorderLeft()) != "none")
+	    	return false;
+	    if(BORDERS.get(style.getBorderRight()) != "none")
+	    	return false;
+	  
+	    //Background/fill colour	    
+	    if((helper.getBGColour(style)) != null) 
+	    	return false;
+	    
+	    return helper.areFontsEmpty(style);	    
+  }
+  
+  public static void writeStyle(XMLStreamWriter xmlWriter, CellStyle style, StyleHelper helper) throws XMLStreamException {
+	  String border = "none";
+	  xmlWriter.writeStartElement("style");
+	  xmlWriter.writeAttribute("id", "style"+style.getIndex());
+	    if((border = BORDERS.get(style.getBorderTop())) != "none") {
+	    	xmlWriter.writeStartElement("border-top");
+	    	xmlWriter.writeCharacters(border);
+	    	xmlWriter.writeEndElement();	    	
+	    }
+	      
+	    if((border = BORDERS.get(style.getBorderBottom())) != "none") {
+	    	xmlWriter.writeStartElement("border-bottom");
+	    	xmlWriter.writeCharacters(border);
+	    	xmlWriter.writeEndElement();	    	
+	    }
+	      
+	    if((border = BORDERS.get(style.getBorderLeft())) != "none") {
+	    	xmlWriter.writeStartElement("border-left");
+	    	xmlWriter.writeCharacters(border);
+	    	xmlWriter.writeEndElement();	    	
+	    }
+	      
+	    if((border = BORDERS.get(style.getBorderRight())) != "none") {
+	    	xmlWriter.writeStartElement("border-right");
+	    	xmlWriter.writeCharacters(border);
+	    	xmlWriter.writeEndElement();	    	
+	    }
+	      
+	  
+	    //Background/fill colour
+	    String backgroundColour;
+	    if((backgroundColour = helper.getBGColour(style)) != null) {
+	    	xmlWriter.writeStartElement("background-color");
+	    	xmlWriter.writeCharacters(backgroundColour);
+	    	xmlWriter.writeEndElement();	    	
+	    }
+	    
+	    helper.writeFontProperties(xmlWriter, style);
+	    
+	    xmlWriter.writeEndElement();
+	    
+	      
+  }
+  
   public static void createStyle(CellStyle style, Element element, StyleHelper helper)
   {
     //Border properties
