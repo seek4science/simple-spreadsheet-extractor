@@ -44,10 +44,10 @@ public class WorkbookParserXMLTest {
 	public void testValidateXLSWithComplexValidations() throws Exception {
 		WorkbookParser p = SpreadsheetTestHelper
 				.openSpreadsheetResource("/complex_validations.xls");
-		String xml = p.asXML();		
+		String xml = p.asXML();
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
-	
+
 	@Test
 	public void testAsXMLForXLSX() throws Exception {
 		WorkbookParser p = SpreadsheetTestHelper
@@ -55,7 +55,7 @@ public class WorkbookParserXMLTest {
 		assertNotNull(p.asXML());
 		SpreadsheetTestHelper.validateAgainstSchema(p.asXML());
 	}
-	
+
 	@Test
 	public void testJERMTemplatesParsableXLS() throws Exception {
 		WorkbookParser p = SpreadsheetTestHelper
@@ -74,24 +74,25 @@ public class WorkbookParserXMLTest {
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
 
-        @Test
+	@Test
 	public void testValidatedSheet() throws Exception {
 		WorkbookParser p = SpreadsheetTestHelper
 				.openSpreadsheetResource("/validated_spreadsheet.xls");
 		String xml = p.asXML();
-                assertNotNull(xml);
-                SpreadsheetTestHelper.validateAgainstSchema(xml);
+		assertNotNull(xml);
+		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
 
-        @Test
-        public void testUnknownFormulaSheet() throws Exception {
-		//This sheet has STDV.S formula which is known
-		//The parser throws error on the cells which the same formula is pulled down
-		//Happnes on MS excel 
-                WorkbookParser p = SpreadsheetTestHelper
-                                .openSpreadsheetResource("/unknown_formula.xlsx");
-                String xml = p.asXML();
-                assertNotNull(xml);
-                SpreadsheetTestHelper.validateAgainstSchema(xml);
-        }
+	@Test
+	public void testUnknownFormulaSheet() throws Exception {
+		// This sheet has STDV.S formula which is known
+		// The parser throws error on the cells which the same formula is pulled
+		// down
+		// Happnes on MS excel
+		WorkbookParser p = SpreadsheetTestHelper
+				.openSpreadsheetResource("/unknown_formula.xlsx");
+		String xml = p.asXML();
+		assertNotNull(xml);
+		SpreadsheetTestHelper.validateAgainstSchema(xml);
+	}
 }

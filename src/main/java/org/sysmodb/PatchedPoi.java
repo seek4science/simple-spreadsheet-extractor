@@ -27,18 +27,17 @@ import org.apache.poi.ss.formula.ptg.StringPtg;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
 /**
- * This class isolates the interaction with Apache POI that relies on following accessor methods that were added to POI in the
- * patch. Hopefully one day this patching won't be necessary
+ * This class isolates the interaction with Apache POI that relies on following
+ * accessor methods that were added to POI in the patch. Hopefully one day this
+ * patching won't be necessary
  * 
- * {@link HSSFSheet#getDataValidityTable()}
- * {@link DataValidityTable#clear()}
- * {@link DVRecord#getFormula1()}
- * {@link DVRecord#getFormula2()}
+ * {@link HSSFSheet#getDataValidityTable()} {@link DataValidityTable#clear()}
+ * {@link DVRecord#getFormula1()} {@link DVRecord#getFormula2()}
  * 
- * @author Stuart Owen 
+ * @author Stuart Owen
  */
 public class PatchedPoi {
-	
+
 	private static final Logger logger = Logger.getAnonymousLogger();
 
 	private static PatchedPoi instance = new PatchedPoi();
@@ -60,8 +59,9 @@ public class PatchedPoi {
 				/**
 				 * /** Implementors may call non-mutating methods on Record r.
 				 * 
-				 * @param r must not be <code>null</code>
-				 *            
+				 * @param r
+				 *            must not be <code>null</code>
+				 * 
 				 */
 				public void visitRecord(Record r) {
 					if (r instanceof DVRecord) {
@@ -88,10 +88,12 @@ public class PatchedPoi {
 							String formula2 = getStringFromPtgTokens(
 									f2.getTokens(), workbook);
 							if (!formula2.isEmpty()) {
-								int comparison = dvRecord.getConditionOperator();
+								int comparison = dvRecord
+										.getConditionOperator();
 								DVConstraint dvConstraint = DVConstraint
-										.createNumericConstraint(validationType,
-												comparison, formula1, formula2);
+										.createNumericConstraint(
+												validationType, comparison,
+												formula1, formula2);
 								HSSFDataValidation validation = new HSSFDataValidation(
 										cellRangeAddressList, dvConstraint);
 								dataValidation.add(validation);
@@ -100,11 +102,11 @@ public class PatchedPoi {
 					}
 				}
 			});
+		} catch (IllegalStateException e) {
+			logger.warning("Unable to read data validations - "
+					+ e.getMessage());
 		}
-		catch(IllegalStateException e) {
-			logger.warning("Unable to read data validations - "+e.getMessage());
-		}
-		
+
 		return dataValidation;
 	}
 

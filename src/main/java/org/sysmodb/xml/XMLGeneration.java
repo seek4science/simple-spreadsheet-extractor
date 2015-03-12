@@ -28,50 +28,53 @@ import org.sysmodb.CellInfo;
 import org.sysmodb.PatchedPoi;
 
 public class XMLGeneration {
-	
+
 	private final Workbook poiWorkbook;
 	private XMLStyleHelper styleHelper = null;
-	private List<CellStyle> styles = new ArrayList<CellStyle>();	
+	private List<CellStyle> styles = new ArrayList<CellStyle>();
 
 	public XMLGeneration(Workbook poiWorkbook) {
-		this.poiWorkbook = poiWorkbook;	
+		this.poiWorkbook = poiWorkbook;
 		if (poiWorkbook instanceof XSSFWorkbook) {
 			styleHelper = new XSSFXMLStyleHelper();
 		} else {
-			styleHelper = new HSSFXMLStyleHelper((HSSFWorkbook) poiWorkbook);			
+			styleHelper = new HSSFXMLStyleHelper((HSSFWorkbook) poiWorkbook);
 		}
 	}
-	
-	public void outputToWriter(Writer outputWriter) throws IOException, XMLStreamException {					       
-		XMLOutputFactory factory      = XMLOutputFactory.newInstance();		
-		XMLStreamWriter xmlwriter  = factory.createXMLStreamWriter(outputWriter);
+
+	public void outputToWriter(Writer outputWriter) throws IOException,
+			XMLStreamException {
+		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		XMLStreamWriter xmlwriter = factory.createXMLStreamWriter(outputWriter);
 		xmlwriter.writeStartDocument();
 		streamXML(xmlwriter);
 		xmlwriter.writeEndDocument();
-				
+
 		xmlwriter.flush();
-		xmlwriter.close();				
-	}		
-	
+		xmlwriter.close();
+	}
+
 	private void streamXML(XMLStreamWriter xmlWriter) throws XMLStreamException {
 		xmlWriter.writeStartElement("workbook");
-		xmlWriter.writeDefaultNamespace("http://www.sysmo-db.org/2010/xml/spreadsheet");
+		xmlWriter
+				.writeDefaultNamespace("http://www.sysmo-db.org/2010/xml/spreadsheet");
 		writeNamedRanged(xmlWriter);
 		writeStyles(xmlWriter);
 		writeSheets(xmlWriter);
 		xmlWriter.writeEndElement();
 	}
-		
-	
-	private void writeSheets(XMLStreamWriter xmlWriter) throws XMLStreamException {
-		
-			for (short i = 0; i < poiWorkbook.getNumberOfSheets(); i++) {				
-				Sheet sheet = poiWorkbook.getSheetAt(i);
-				writeSheet(xmlWriter,i,sheet);		
-			}
+
+	private void writeSheets(XMLStreamWriter xmlWriter)
+			throws XMLStreamException {
+
+		for (short i = 0; i < poiWorkbook.getNumberOfSheets(); i++) {
+			Sheet sheet = poiWorkbook.getSheetAt(i);
+			writeSheet(xmlWriter, i, sheet);
+		}
 	}
-	
-	private void writeSheet(XMLStreamWriter xmlWriter,short sheetIndex,Sheet sheet) throws XMLStreamException {
+
+	private void writeSheet(XMLStreamWriter xmlWriter, short sheetIndex,
+			Sheet sheet) throws XMLStreamException {
 		xmlWriter.writeStartElement("sheet");
 		xmlWriter.writeAttribute("name", sheet.getSheetName());
 		xmlWriter.writeAttribute("index", String.valueOf(sheetIndex + 1));
@@ -79,29 +82,28 @@ public class XMLGeneration {
 				String.valueOf(poiWorkbook.isSheetHidden(sheetIndex)));
 		xmlWriter.writeAttribute("very_hidden",
 				String.valueOf(poiWorkbook.isSheetVeryHidden(sheetIndex)));
-		
-		
-		writeDataValidations(xmlWriter,sheet);
-		
-		writeColumns(xmlWriter,sheet);
-		
+
+		writeDataValidations(xmlWriter, sheet);
+
+		writeColumns(xmlWriter, sheet);
+
 		writeRows(xmlWriter, sheet);
-		
-		xmlWriter.writeEndElement();		
-		
+
+		xmlWriter.writeEndElement();
+
 	}
-	
-	private void writeDataValidations(XMLStreamWriter xmlWriter, Sheet sheet) throws XMLStreamException {
+
+	private void writeDataValidations(XMLStreamWriter xmlWriter, Sheet sheet)
+			throws XMLStreamException {
 		xmlWriter.writeStartElement("data_validations");
 		if (sheet instanceof HSSFSheet) {
-			writeHSSFDataValidations(xmlWriter,(HSSFSheet)sheet);
-		}
-		else {
-			writeXSSFDataValidations(xmlWriter,(XSSFSheet)sheet);			
+			writeHSSFDataValidations(xmlWriter, (HSSFSheet) sheet);
+		} else {
+			writeXSSFDataValidations(xmlWriter, (XSSFSheet) sheet);
 		}
 		xmlWriter.writeEndElement();
 	}
-	
+
 	private void writeHSSFDataValidations(XMLStreamWriter xmlWriter,
 			HSSFSheet sheet) throws XMLStreamException {
 		List<HSSFDataValidation> validationData = PatchedPoi.getInstance()
@@ -121,35 +123,43 @@ public class XMLGeneration {
 	private void writeDataValidation(XMLStreamWriter xmlWriter,
 			CellRangeAddress address, String formula) throws XMLStreamException {
 		xmlWriter.writeStartElement("data_validation");
-		xmlWriter.writeAttribute("first_column",String.valueOf(address.getFirstColumn()+1));
-		xmlWriter.writeAttribute("last_column",String.valueOf(address.getLastColumn()+1));
-		xmlWriter.writeAttribute("first_row",String.valueOf(address.getFirstRow()+1));
-		xmlWriter.writeAttribute("last_row",String.valueOf(address.getLastRow()+1));
+		xmlWriter.writeAttribute("first_column",
+				String.valueOf(address.getFirstColumn() + 1));
+		xmlWriter.writeAttribute("last_column",
+				String.valueOf(address.getLastColumn() + 1));
+		xmlWriter.writeAttribute("first_row",
+				String.valueOf(address.getFirstRow() + 1));
+		xmlWriter.writeAttribute("last_row",
+				String.valueOf(address.getLastRow() + 1));
 		xmlWriter.writeStartElement("constraint");
 		xmlWriter.writeCharacters(formula);
 		xmlWriter.writeEndElement();
 		xmlWriter.writeEndElement();
 	}
-	
-	private void writeXSSFDataValidations(XMLStreamWriter xmlWriter,XSSFSheet sheet) throws XMLStreamException {
+
+	private void writeXSSFDataValidations(XMLStreamWriter xmlWriter,
+			XSSFSheet sheet) throws XMLStreamException {
 		List<XSSFDataValidation> validationData = sheet.getDataValidations();
 		for (XSSFDataValidation validation : validationData) {
-			for (CellRangeAddress address : validation.getRegions().getCellRangeAddresses()) {				
-				String formula = validation.getValidationConstraint().getFormula1();
-				if (formula!=null) {
+			for (CellRangeAddress address : validation.getRegions()
+					.getCellRangeAddresses()) {
+				String formula = validation.getValidationConstraint()
+						.getFormula1();
+				if (formula != null) {
 					writeDataValidation(xmlWriter, address, formula);
-				}						
-			}			
+				}
+			}
 		}
 	}
-	
-	private void writeColumns(XMLStreamWriter xmlWriter, Sheet sheet) throws XMLStreamException {
+
+	private void writeColumns(XMLStreamWriter xmlWriter, Sheet sheet)
+			throws XMLStreamException {
 		int firstCol = 1;
 		int lastCol = 1;
-		//determine first and last column
-		for (int y=sheet.getFirstRowNum();y<=sheet.getLastRowNum();y++) {
+		// determine first and last column
+		for (int y = sheet.getFirstRowNum(); y <= sheet.getLastRowNum(); y++) {
 			Row row = sheet.getRow(y);
-			if (row==null) {
+			if (row == null) {
 				continue;
 			}
 			int firstCell = row.getFirstCellNum();
@@ -164,8 +174,7 @@ public class XMLGeneration {
 				lastCol = lastCell;// Number of columns
 		}
 		xmlWriter.writeStartElement("columns");
-		xmlWriter.writeAttribute("first_column",
-				String.valueOf(firstCol));
+		xmlWriter.writeAttribute("first_column", String.valueOf(firstCol));
 		xmlWriter.writeAttribute("last_column", String.valueOf(lastCol));
 		for (int x = firstCol - 1; x < lastCol; x++) {
 			xmlWriter.writeStartElement("column");
@@ -186,54 +195,56 @@ public class XMLGeneration {
 		xmlWriter.writeStartElement("rows");
 		xmlWriter.writeAttribute("first_row", String.valueOf(firstRow + 1));
 		xmlWriter.writeAttribute("last_row", String.valueOf(lastRow + 1));
-		
+
 		for (int y = firstRow; y <= lastRow; y++) {
-			Row row = sheet.getRow(y);			
+			Row row = sheet.getRow(y);
 			if (row != null) {
-				writeRow(xmlWriter,y,row,sheet);
+				writeRow(xmlWriter, y, row, sheet);
 			}
 		}
-		
-				
+
 		xmlWriter.writeEndElement();
 	}
-		
-	private void writeRow(XMLStreamWriter xmlWriter, int index, Row row, Sheet sheet) throws XMLStreamException {
+
+	private void writeRow(XMLStreamWriter xmlWriter, int index, Row row,
+			Sheet sheet) throws XMLStreamException {
 		xmlWriter.writeStartElement("row");
-		xmlWriter.writeAttribute("index",String.valueOf(index+1));
+		xmlWriter.writeAttribute("index", String.valueOf(index + 1));
 		if (sheet.getDefaultRowHeightInPoints() != row.getHeightInPoints()) {
-			xmlWriter.writeAttribute("height","" + row.getHeightInPoints() + "pt");			
+			xmlWriter.writeAttribute("height", "" + row.getHeightInPoints()
+					+ "pt");
 		}
-		if (row.getFirstCellNum()!=-1) {
-			writeCells(xmlWriter,row);
+		if (row.getFirstCellNum() != -1) {
+			writeCells(xmlWriter, row);
 		}
 		xmlWriter.writeEndElement();
 	}
-	
-	private void writeCells(XMLStreamWriter xmlWriter, Row row) throws XMLStreamException {		
+
+	private void writeCells(XMLStreamWriter xmlWriter, Row row)
+			throws XMLStreamException {
 		for (int x = row.getFirstCellNum(); x <= row.getLastCellNum(); x++) {
 			Cell cell = row.getCell(x);
 			if (cell != null) {
-				CellInfo info = new CellInfo(cell,poiWorkbook);
+				CellInfo info = new CellInfo(cell, poiWorkbook);
 
 				if (info.value != null) {
-					xmlWriter.writeStartElement("cell");					
-					
-					xmlWriter.writeAttribute("column",
-							String.valueOf(x + 1));
-					xmlWriter.writeAttribute("column_alpha",
-							column_alpha(x));
+					xmlWriter.writeStartElement("cell");
+
+					xmlWriter.writeAttribute("column", String.valueOf(x + 1));
+					xmlWriter.writeAttribute("column_alpha", column_alpha(x));
 					xmlWriter.writeAttribute("row",
 							String.valueOf(row.getRowNum() + 1));
 					xmlWriter.writeAttribute("type", info.type);
-					
+
 					int styleIndex = cell.getCellStyle().getIndex();
-					if (styles.get(styleIndex)!=null) {
-						xmlWriter.writeAttribute("style", "style"+cell.getCellStyle().getIndex());
+					if (styles.get(styleIndex) != null) {
+						xmlWriter.writeAttribute("style", "style"
+								+ cell.getCellStyle().getIndex());
 					}
-					
+
 					if (info.formula != null) {
-						xmlWriter.writeAttribute("formula", stripControlCharacters(info.formula));
+						xmlWriter.writeAttribute("formula",
+								stripControlCharacters(info.formula));
 					}
 					xmlWriter.writeCharacters(info.value);
 					xmlWriter.writeEndElement();
@@ -242,82 +253,90 @@ public class XMLGeneration {
 			}
 		}
 	}
-	
-	private void writeNamedRanged(XMLStreamWriter xmlWriter) throws XMLStreamException {
+
+	private void writeNamedRanged(XMLStreamWriter xmlWriter)
+			throws XMLStreamException {
 		xmlWriter.writeStartElement("named_ranges");
-		
-		for(int i = 0; i < poiWorkbook.getNumberOfNames(); i++) {
-            Name name = poiWorkbook.getNameAt(i);            
-            try {
-            	if(!name.isDeleted() && !name.isFunctionName()) {                	
-                	String formula = name.getRefersToFormula();                	
-                	AreaReference areaReference = new AreaReference(formula);
-                    CellReference firstCellReference = areaReference.getFirstCell();
-                    CellReference lastCellReference = areaReference.getLastCell();
-                    formula = formula.replaceAll("\\p{C}", "?");
-                    
-                    xmlWriter.writeStartElement("named_range");
-                    
-                    xmlWriter.writeAttribute("first_column", String.valueOf(firstCellReference.getCol()+1));                                       
-                    xmlWriter.writeAttribute("first_row", String.valueOf(firstCellReference.getRow()+1));
-                    xmlWriter.writeAttribute("last_column", String.valueOf(lastCellReference.getCol()+1));
-                    xmlWriter.writeAttribute("last_row", String.valueOf(lastCellReference.getRow()+1));
-                    
-                    xmlWriter.writeStartElement("name");
-                    xmlWriter.writeCharacters(name.getNameName());
-                    xmlWriter.writeEndElement();
-                    
-                    xmlWriter.writeStartElement("sheet_name");
-                    xmlWriter.writeCharacters(name.getSheetName());
-                    xmlWriter.writeEndElement();
-                    
-                    xmlWriter.writeStartElement("refers_to_formula");
-                    xmlWriter.writeCharacters(stripControlCharacters(formula));
-                    xmlWriter.writeEndElement();
-                    
-                    xmlWriter.writeEndElement();                                                                              
-                }
-            }            
-            catch(RuntimeException e) {
-            	//caused by an not implemented error in POI related to macros, and some invalid formala's that dont' relate to contiguous ranges.
-            }                                    
-		}	
-		
+
+		for (int i = 0; i < poiWorkbook.getNumberOfNames(); i++) {
+			Name name = poiWorkbook.getNameAt(i);
+			try {
+				if (!name.isDeleted() && !name.isFunctionName()) {
+					String formula = name.getRefersToFormula();
+					AreaReference areaReference = new AreaReference(formula);
+					CellReference firstCellReference = areaReference
+							.getFirstCell();
+					CellReference lastCellReference = areaReference
+							.getLastCell();
+					formula = formula.replaceAll("\\p{C}", "?");
+
+					xmlWriter.writeStartElement("named_range");
+
+					xmlWriter.writeAttribute("first_column",
+							String.valueOf(firstCellReference.getCol() + 1));
+					xmlWriter.writeAttribute("first_row",
+							String.valueOf(firstCellReference.getRow() + 1));
+					xmlWriter.writeAttribute("last_column",
+							String.valueOf(lastCellReference.getCol() + 1));
+					xmlWriter.writeAttribute("last_row",
+							String.valueOf(lastCellReference.getRow() + 1));
+
+					xmlWriter.writeStartElement("name");
+					xmlWriter.writeCharacters(name.getNameName());
+					xmlWriter.writeEndElement();
+
+					xmlWriter.writeStartElement("sheet_name");
+					xmlWriter.writeCharacters(name.getSheetName());
+					xmlWriter.writeEndElement();
+
+					xmlWriter.writeStartElement("refers_to_formula");
+					xmlWriter.writeCharacters(stripControlCharacters(formula));
+					xmlWriter.writeEndElement();
+
+					xmlWriter.writeEndElement();
+				}
+			} catch (RuntimeException e) {
+				// caused by an not implemented error in POI related to macros,
+				// and some invalid formala's that dont' relate to contiguous
+				// ranges.
+			}
+		}
+
 		xmlWriter.writeEndElement();
 	}
-	
-	private void writeStyles(XMLStreamWriter xmlWriter) throws XMLStreamException {
+
+	private void writeStyles(XMLStreamWriter xmlWriter)
+			throws XMLStreamException {
 		xmlWriter.writeStartElement("styles");
 		gatherStyles();
 		for (CellStyle style : styles) {
-			if (style!=null) {
-				XMLStyleGenerator.writeStyle(xmlWriter,style,styleHelper);
+			if (style != null) {
+				XMLStyleGenerator.writeStyle(xmlWriter, style, styleHelper);
 			}
 		}
-		
+
 		xmlWriter.writeEndElement();
 	}
-	
+
 	private void gatherStyles() {
-		for (short i = 0; i<getWorkbook().getNumCellStyles();i++) {			
+		for (short i = 0; i < getWorkbook().getNumCellStyles(); i++) {
 			try {
 				CellStyle style = getWorkbook().getCellStyleAt(i);
 				if (isStyleEmpty(style)) {
 					styles.add(i, null);
-				}
-				else {
+				} else {
 					styles.add(i, style);
 				}
 			}
 			// Sometimes XSLX messes up and reports wrong number of
 			// styles...
 			catch (IndexOutOfBoundsException e) {
-				styles.add(i,null);
+				styles.add(i, null);
 				break;
-			}			
-		}		
+			}
+		}
 	}
-	
+
 	private boolean isStyleEmpty(CellStyle style) {
 		return XMLStyleGenerator.isStyleEmpty(style, styleHelper);
 	}
@@ -331,7 +350,7 @@ public class XMLGeneration {
 		}
 		return result;
 	}
-	
+
 	private Workbook getWorkbook() {
 		return poiWorkbook;
 	}

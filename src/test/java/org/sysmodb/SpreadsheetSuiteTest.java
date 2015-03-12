@@ -25,7 +25,8 @@ import org.junit.Test;
  */
 public class SpreadsheetSuiteTest {
 	private final String ROOT = "spreadsheet_suite";
-	private static final Logger logger = Logger.getLogger("SpreadsheetSuiteTest");
+	private static final Logger logger = Logger
+			.getLogger("SpreadsheetSuiteTest");
 	private final boolean FAIL_QUIETLY = true;
 
 	/**
@@ -43,25 +44,24 @@ public class SpreadsheetSuiteTest {
 				assertNotNull(resourceURL);
 				InputStream stream = resourceURL.openStream();
 				WorkbookParser p = new WorkbookParser(stream);
-				String xml = p.asXML();				
+				String xml = p.asXML();
 				SpreadsheetTestHelper.validateAgainstSchema(xml);
-			}
-			catch(Exception e) {
-				logger.severe("Error parsing "+name+" - "+e.getMessage());
-				if (!FAIL_QUIETLY) {					
+			} catch (Exception e) {
+				logger.severe("Error parsing " + name + " - " + e.getMessage());
+				if (!FAIL_QUIETLY) {
 					throw e;
 				}
-			}			
+			}
 		}
 	}
 
 	private List<String> getSpreadsheetResourceNames() {
-		List<String> names =  new ArrayList<String>();
-		names.add("problematic_spreadsheet.xls");		
+		List<String> names = new ArrayList<String>();
+		names.add("problematic_spreadsheet.xls");
 		names.add("problematic_spreadsheet2.xls");
 		names.add("problematic_spreadsheet3.xls");
 		names.add("pride_template_empty.xls");
-		
+
 		return names;
 	}
 

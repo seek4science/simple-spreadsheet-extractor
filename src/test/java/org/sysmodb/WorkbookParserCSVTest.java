@@ -19,7 +19,7 @@ import java.net.URL;
 
 import org.junit.Test;
 
-public class WorkbookParserCSVTest {	
+public class WorkbookParserCSVTest {
 
 	@Test
 	public void testAsCSVAnotherSheet() throws Exception {

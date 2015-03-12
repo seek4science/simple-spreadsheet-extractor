@@ -29,7 +29,7 @@ public class XMLGenerationTest {
 				.openSpreadsheetResource("/test-spreadsheet.xls");
 		assertNotNull(convertToXMLDocument(new XMLGeneration(p.getWorkbook())));
 	}
-	
+
 	@Test
 	public void testDataValidationsXLS() throws Exception {
 		WorkbookParser p = SpreadsheetTestHelper
@@ -45,25 +45,26 @@ public class XMLGenerationTest {
 				.openSpreadsheetResource("/test-spreadsheet.xlsx");
 		assertNotNull(convertToXMLDocument(new XMLGeneration(p.getWorkbook())));
 	}
-	
+
 	@Test
 	public void testNumberFormatting() throws Exception {
 		WorkbookParser p = SpreadsheetTestHelper
 				.openSpreadsheetResource("/numbers_and_strings.xls");
-		Document doc = convertToXMLDocument(new XMLGeneration(p.getWorkbook()));		
+		Document doc = convertToXMLDocument(new XMLGeneration(p.getWorkbook()));
 		Namespace defNamespace = doc.getRootElement().getNamespace();
 		doc.getRootElement().addNamespace("bbb", defNamespace.getURI());
 		Map<String, String> namespaceURIs = new HashMap<String, String>();
 		namespaceURIs.put("bbb", defNamespace.getURI());
-		String [] expected = new String[]{"49","49","49","49.95","49.95","49.95"};
+		String[] expected = new String[] { "49", "49", "49", "49.95", "49.95",
+				"49.95" };
 		XPath xpath = DocumentHelper
 				.createXPath("//bbb:cell[@column_alpha='B']");
 		@SuppressWarnings("unchecked")
 		List<Node> nodes = xpath.selectNodes(doc);
-		int i=0;
+		int i = 0;
 		for (Node node : nodes) {
 			String val = node.getStringValue();
-			assertEquals(expected[i++],val);
+			assertEquals(expected[i++], val);
 		}
 	}
 
@@ -134,30 +135,31 @@ public class XMLGenerationTest {
 		assertEquals("14", matches.get(0).getText());
 	}
 
-	private Document convertToXMLDocument(XMLGeneration generator) throws IOException, DocumentException, XMLStreamException {
+	private Document convertToXMLDocument(XMLGeneration generator)
+			throws IOException, DocumentException, XMLStreamException {
 		StringWriter out = new StringWriter();
 		generator.outputToWriter(out);
 		Document document = DocumentHelper.parseText(out.toString());
-		//printOutXML(document);		
-		return document;		
+		// printOutXML(document);
+		return document;
 	}
-	
-//	private void printOutXML(Document document) {
-//		StringWriter out = new StringWriter();
-//		OutputFormat format = OutputFormat.createPrettyPrint();
-//		format.setEncoding("UTF-8");		
-//		XMLWriter writer = new XMLWriter(out, format);
-//		
-//		writer.setEscapeText(true);						
-//		
-//		try {			
-//			writer.write(document);
-//			writer.close();
-//			System.out.println(out.toString());
-//		} catch (IOException e) {
-//			// should never get here, since we are using a StringWriter rather
-//			// than IO based Writer
-//			e.printStackTrace();			
-//		}
-//	}
+
+	// private void printOutXML(Document document) {
+	// StringWriter out = new StringWriter();
+	// OutputFormat format = OutputFormat.createPrettyPrint();
+	// format.setEncoding("UTF-8");
+	// XMLWriter writer = new XMLWriter(out, format);
+	//
+	// writer.setEscapeText(true);
+	//
+	// try {
+	// writer.write(document);
+	// writer.close();
+	// System.out.println(out.toString());
+	// } catch (IOException e) {
+	// // should never get here, since we are using a StringWriter rather
+	// // than IO based Writer
+	// e.printStackTrace();
+	// }
+	// }
 }

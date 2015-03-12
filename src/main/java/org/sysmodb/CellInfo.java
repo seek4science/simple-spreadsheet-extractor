@@ -15,25 +15,25 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 
 public class CellInfo {
-	
+
 	private final static SimpleDateFormat dateFormatter = new SimpleDateFormat(
 			"yyyy-MM-dd'T'H:m:sZ");
-	
+
 	public String type;
 	public String value;
 	public String formula;
-	
+
 	public CellInfo(Cell cell, Workbook workbook) {
 		if (cell == null) {
 			value = "";
 			type = "blank";
 			formula = null;
-		} else {			
-			readCellValueAndType(cell.getCellType(),cell);			
+		} else {
+			readCellValueAndType(cell.getCellType(), cell);
 		}
 	}
-	
-	private void readCellValueAndType(int cellType,Cell cell) {
+
+	private void readCellValueAndType(int cellType, Cell cell) {
 		switch (cellType) {
 		case Cell.CELL_TYPE_BLANK:
 			value = "";
@@ -50,13 +50,12 @@ public class CellInfo {
 				value = dateFormatter.format(dateCellValue);
 			} else {
 				double numericValue = cell.getNumericCellValue();
-				int intValue = (int)numericValue;
-				if (intValue==numericValue) {
+				int intValue = (int) numericValue;
+				if (intValue == numericValue) {
 					value = String.valueOf(intValue);
-				}
-				else {
+				} else {
 					value = String.valueOf(numericValue);
-				}				
+				}
 				type = "numeric";
 			}
 			break;
@@ -64,15 +63,15 @@ public class CellInfo {
 			value = cell.getStringCellValue();
 			type = "string";
 			break;
-			case Cell.CELL_TYPE_FORMULA:
-				try {
-					formula = cell.getCellFormula();
-				} catch (FormulaParseException e) {
+		case Cell.CELL_TYPE_FORMULA:
+			try {
+				formula = cell.getCellFormula();
+			} catch (FormulaParseException e) {
 
-				}
-				int resultCellType = cell.getCachedFormulaResultType();
-				readCellValueAndType(resultCellType, cell);
-				break;
+			}
+			int resultCellType = cell.getCachedFormulaResultType();
+			readCellValueAndType(resultCellType, cell);
+			break;
 		}
 	}
 }

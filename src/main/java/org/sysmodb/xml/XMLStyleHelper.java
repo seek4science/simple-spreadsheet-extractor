@@ -11,15 +11,16 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.poi.ss.usermodel.CellStyle;
 
- /**
- *
+/**
+ * 
  * @author Finn, Stuart Owen
  */
 public interface XMLStyleHelper {
 
-    String getBGColour(CellStyle style);    
-    
-    boolean areFontsEmpty(CellStyle style);
-    
-    void writeFontProperties(XMLStreamWriter xmlWriter, CellStyle style) throws XMLStreamException;
+	String getBGColour(CellStyle style);
+
+	boolean areFontsEmpty(CellStyle style);
+
+	void writeFontProperties(XMLStreamWriter xmlWriter, CellStyle style)
+			throws XMLStreamException;
 }

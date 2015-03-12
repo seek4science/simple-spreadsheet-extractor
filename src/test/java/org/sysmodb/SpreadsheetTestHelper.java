@@ -44,12 +44,11 @@ public class SpreadsheetTestHelper {
 		source.setEncoding("UTF-8");
 		try {
 			reader.read(source);
-		}
-		catch(DocumentException e) {
-			//System.out.println(xml);
+		} catch (DocumentException e) {
+			// System.out.println(xml);
 			throw e;
 		}
-		
-	}	
+
+	}
 
 }

@@ -16,36 +16,35 @@ public class OptionParser {
 	private int sheet = -1;
 	private boolean trim = false;
 
-	private static List<String> VALID_FORMATS = Arrays.asList(new String [] {"xml","csv"});
+	private static List<String> VALID_FORMATS = Arrays.asList(new String[] {
+			"xml", "csv" });
 
 	public OptionParser(String[] args) throws InvalidOptionException {
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
 			if (arg.equals("-o")) {
 				i++;
-				setOutputFormat(args[i]);				
-			}
-			else if (arg.equals("-f")) {
+				setOutputFormat(args[i]);
+			} else if (arg.equals("-f")) {
 				i++;
-				setFilename(args[i]);				
-			}
-			else if (arg.equals("-s")) {
+				setFilename(args[i]);
+			} else if (arg.equals("-s")) {
 				i++;
 				setSheet(args[i]);
-			}
-			else if (arg.equals("-t")) {
-				trim=true;
-			}				
-			else {
-				throw new InvalidOptionException("Unrecognised option: " + args[i]);
+			} else if (arg.equals("-t")) {
+				trim = true;
+			} else {
+				throw new InvalidOptionException("Unrecognised option: "
+						+ args[i]);
 			}
 		}
-		//if CSV format and sheet is not defined, then defaults to the first sheet
-		if (getOutputFormat().equals("csv") && getSheet()==-1) {
-			sheet=1;
+		// if CSV format and sheet is not defined, then defaults to the first
+		// sheet
+		if (getOutputFormat().equals("csv") && getSheet() == -1) {
+			sheet = 1;
 		}
 	}
-	
+
 	public boolean getTrim() {
 		return trim;
 	}
@@ -53,6 +52,7 @@ public class OptionParser {
 	public int getSheet() {
 		return sheet;
 	}
+
 	public String getOutputFormat() {
 		return outputFormat;
 	}
@@ -64,16 +64,16 @@ public class OptionParser {
 	public String getFilename() {
 		return filename;
 	}
-	
-	private void setSheet(String sheet)  throws InvalidOptionException{
+
+	private void setSheet(String sheet) throws InvalidOptionException {
 		try {
 			this.sheet = Integer.parseInt(sheet);
-		}
-		catch(NumberFormatException e) {
-			throw new InvalidOptionException("Invalid sheet number supplied: '"+sheet+"'");
+		} catch (NumberFormatException e) {
+			throw new InvalidOptionException("Invalid sheet number supplied: '"
+					+ sheet + "'");
 		}
 	}
-	
+
 	private void setOutputFormat(String format) throws InvalidOptionException {
 		format = format.toLowerCase();
 		if (VALID_FORMATS.contains(format)) {
