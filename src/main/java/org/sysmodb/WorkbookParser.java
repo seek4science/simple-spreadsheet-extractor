@@ -46,6 +46,7 @@ public class WorkbookParser {
 		XMLGeneration generator = new XMLGeneration(poiWorkbook);
 		try {
 			generator.outputToWriter(out);
+			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (XMLStreamException e) {
@@ -68,9 +69,11 @@ public class WorkbookParser {
 				trim);
 		try {
 			generator.outputToWriter(out);
+			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 	}
 
 	public Workbook getWorkbook() {
