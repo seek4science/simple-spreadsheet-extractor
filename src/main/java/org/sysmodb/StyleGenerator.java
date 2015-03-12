@@ -6,10 +6,11 @@
  ******************************************************************************/
 package org.sysmodb;
 
-import org.apache.poi.ss.usermodel.CellStyle;
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.dom4j.Element;
 
 /**

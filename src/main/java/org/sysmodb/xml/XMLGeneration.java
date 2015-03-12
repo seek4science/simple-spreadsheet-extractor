@@ -8,6 +8,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -28,10 +32,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 import org.sysmodb.CellInfo;
-import org.sysmodb.ControlCharStrippingXMLWriter;
 import org.sysmodb.HSSFStyleHelper;
 import org.sysmodb.PatchedPoi;
 import org.sysmodb.StyleGenerator;
@@ -52,153 +53,171 @@ public class XMLGeneration {
 		}
 	}
 	
-	public void outputToWriter(Writer outputWriter) throws IOException {
-		OutputFormat format = OutputFormat.createPrettyPrint();
-		format.setEncoding("UTF-8");		
-		XMLWriter writer = new ControlCharStrippingXMLWriter(outputWriter, format);
+	public void outputToWriter(Writer outputWriter) throws IOException, XMLStreamException {
+			
 		
-		writer.setEscapeText(true);						
+        //writer.write(asXMLDocument());
+		//messingabout(outputWriter);
+		XMLOutputFactory factory      = XMLOutputFactory.newInstance();		
+		XMLStreamWriter xmlwriter  = factory.createXMLStreamWriter(outputWriter);
+		xmlwriter.writeStartDocument();
+		streamXML(xmlwriter);
+		xmlwriter.writeEndDocument();
 		
-		writer.write(asXMLDocument());
-		writer.close();			
+		
+		xmlwriter.flush();
+		xmlwriter.close();
+		
+		
+	}		
+	
+	private void streamXML(XMLStreamWriter xmlWriter) throws XMLStreamException {
+		xmlWriter.writeStartElement("workbook");
+		xmlWriter.writeDefaultNamespace("http://www.sysmo-db.org/2010/xml/spreadsheet");
+		writeNamedRanged(xmlWriter);
+		writeSheets(xmlWriter);
+		xmlWriter.writeEndElement();
 	}
 	
-	private Document asXMLDocument() {
-		Namespace xmlns = new Namespace("",
-				"http://www.sysmo-db.org/2010/xml/spreadsheet");
-		QName workbookName = QName.get("workbook", xmlns);				
+	private void writeSheets(XMLStreamWriter xmlWriter) throws XMLStreamException {
 		
-		Document doc = DocumentHelper.createDocument();		
-		
-		Element root = doc.addElement(workbookName);
-		
-		describeNamedRanges(root);
-
-		// Element to hold the cell styles
-		Element stylesElement = root.addElement("styles");
-
-		ArrayList<LinkedList<Element>> styleMap = collectStyleDefinitions();
-
-		describeSheetContents(root, styleMap);
-
-		describeStyles(stylesElement, styleMap);
-
-		return doc;
+			for (short i = 0; i < poiWorkbook.getNumberOfSheets(); i++) {				
+				Sheet sheet = poiWorkbook.getSheetAt(i);
+				writeSheet(xmlWriter,i,sheet);		
+			}
 	}
-
-	private void describeStyles(Element stylesElement,
-			ArrayList<LinkedList<Element>> styleMap) {
-		// Remove duplicate styles
-		Hashtable<Integer, Short> styleHashTable = new Hashtable<Integer, Short>();
-
-		// Add style info to style element
-		for (short s = 0; s < poiWorkbook.getNumCellStyles(); s++) {
-
-			// Don't bother rendering styles that aren't used in any cells!
-			if (styleMap.get(s).isEmpty())
+	
+	private void writeSheet(XMLStreamWriter xmlWriter,short sheetIndex,Sheet sheet) throws XMLStreamException {
+		xmlWriter.writeStartElement("sheet");
+		xmlWriter.writeAttribute("name", sheet.getSheetName());
+		xmlWriter.writeAttribute("index", String.valueOf(sheetIndex + 1));
+		xmlWriter.writeAttribute("hidden",
+				String.valueOf(poiWorkbook.isSheetHidden(sheetIndex)));
+		xmlWriter.writeAttribute("very_hidden",
+				String.valueOf(poiWorkbook.isSheetVeryHidden(sheetIndex)));
+		
+		
+		//write data validation
+		
+		writeColumns(xmlWriter,sheet);
+		
+		writeRows(xmlWriter, sheet);
+		
+		
+		
+		
+		xmlWriter.writeEndElement();		
+		
+	}
+	
+	private void writeColumns(XMLStreamWriter xmlWriter, Sheet sheet) throws XMLStreamException {
+		int firstCol = 1;
+		int lastCol = 1;
+		//determine first and last column
+		for (int y=sheet.getFirstRowNum();y<=sheet.getLastRowNum();y++) {
+			Row row = sheet.getRow(y);
+			if (row==null) {
+				continue;
+			}
+			int firstCell = row.getFirstCellNum();
+			if (firstCell == -1)
 				continue;
 
-			CellStyle style;
-			try {
-				style = poiWorkbook.getCellStyleAt(s);
-			}
-			// Sometimes XSLX messes up and reports wrong number of
-			// styles...
-			catch (IndexOutOfBoundsException e) {
-				break;
-			}
+			if (firstCell < firstCol)
+				firstCol = firstCell + 1;// Number of columns
 
-			Element styleElement = stylesElement.addElement("style");
-			styleElement.addAttribute("id", ("style" + s));
-			StyleGenerator.createStyle(style, styleElement, styleHelper);
+			int lastCell = row.getLastCellNum();
+			if (lastCell > lastCol)
+				lastCol = lastCell;// Number of columns
+		}
+		xmlWriter.writeStartElement("columns");
+		xmlWriter.writeAttribute("first_column",
+				String.valueOf(firstCol));
+		xmlWriter.writeAttribute("last_column", String.valueOf(lastCol));
+		for (int x = firstCol - 1; x < lastCol; x++) {
+			xmlWriter.writeStartElement("column");
+			xmlWriter.writeAttribute("index", String.valueOf(x + 1));
+			xmlWriter.writeAttribute("column_alpha",
+					String.valueOf(column_alpha(x)));
+			xmlWriter.writeAttribute("width",
+					String.valueOf(sheet.getColumnWidth(x)));
+			xmlWriter.writeEndElement();
+		}
+		xmlWriter.writeEndElement();
+	}
 
-			// If we have an empty style element, its useless, so don't display
-			// it
-			if (styleElement.elements().isEmpty()) {
-				styleElement.detach();
-				// Remove "style" attributes from cells that were linked to the
-				// blank style
-				Iterator<Element> iter = styleMap.get(s).iterator();
-				while (iter.hasNext()) {
-					iter.next().addAttribute("style", null);
-				}
-			} else {
-				int styleHash = StyleGenerator.getStyleHash(styleElement);
-				// Check a duplicate style doesn't already exist, if it does,
-				// point all cells to that style and delete
-				// the duplicate
-				if (styleHashTable.containsKey(styleHash)) {
-					styleElement.detach();
-					Iterator<Element> iter = styleMap.get(s).iterator();
-					while (iter.hasNext()) {
-						iter.next().addAttribute(
-								"style",
-								"style"
-										+ styleHashTable.get(styleHash)
-												.toString());
+	private void writeRows(XMLStreamWriter xmlWriter, Sheet sheet)
+			throws XMLStreamException {
+		int firstRow = sheet.getFirstRowNum();
+		int lastRow = sheet.getLastRowNum();
+		xmlWriter.writeStartElement("rows");
+		xmlWriter.writeAttribute("first_row", String.valueOf(firstRow + 1));
+		xmlWriter.writeAttribute("last_row", String.valueOf(lastRow + 1));
+		
+		for (int y = firstRow; y <= lastRow; y++) {
+			Row row = sheet.getRow(y);			
+			if (row != null) {
+				writeRow(xmlWriter,y,row,sheet);
+			}
+		}
+		
+				
+		xmlWriter.writeEndElement();
+	}
+		
+	private void writeRow(XMLStreamWriter xmlWriter, int index, Row row, Sheet sheet) throws XMLStreamException {
+		xmlWriter.writeStartElement("row");
+		xmlWriter.writeAttribute("index",String.valueOf(index));
+		if (sheet.getDefaultRowHeightInPoints() != row.getHeightInPoints()) {
+			xmlWriter.writeAttribute("height","" + row.getHeightInPoints() + "pt");			
+		}
+		if (row.getFirstCellNum()!=-1) {
+			writeCells(xmlWriter,row);
+		}
+		xmlWriter.writeEndElement();
+	}
+	
+	private void writeCells(XMLStreamWriter xmlWriter, Row row) throws XMLStreamException {		
+		for (int x = row.getFirstCellNum(); x <= row.getLastCellNum(); x++) {
+			Cell cell = row.getCell(x);
+			if (cell != null) {
+				CellInfo info = new CellInfo(cell,poiWorkbook);
+
+				if (info.value != null) {
+					xmlWriter.writeStartElement("cell");					
+					
+					xmlWriter.writeAttribute("column",
+							String.valueOf(x + 1));
+					xmlWriter.writeAttribute("column_alpha",
+							column_alpha(x));
+					xmlWriter.writeAttribute("row",
+							String.valueOf(row.getRowNum() + 1));
+					xmlWriter.writeAttribute("type", info.type);
+					if (info.formula != null) {
+						xmlWriter.writeAttribute("formula", info.formula);
 					}
-				} else {
-					styleHashTable.put(styleHash, s);
+					xmlWriter.writeCharacters(info.value);
+					xmlWriter.writeEndElement();
+
+					// Cell style
+					// Add to style linked list
+//					int styleIndex = cell.getCellStyle().getIndex();
+//
+//					styleMap.get(styleIndex).add(cellElement);
+//					cellElement.addAttribute("style",
+//							("style" + cell.getCellStyle()
+//									.getIndex()));
+//
+//					if (info.formula != null) {
+//						cellElement.addAttribute("formula",
+//								info.formula);
+//					}
+//					cellElement.setText(info.value);
 				}
 			}
 		}
 	}
-
-	private void describeSheetContents(Element root,
-			ArrayList<LinkedList<Element>> styleMap) {
-		for (int i = 0; i < poiWorkbook.getNumberOfSheets(); i++) {
-			Element sheetElement = root.addElement("sheet");
-
-			Sheet sheet = poiWorkbook.getSheetAt(i);
-
-			sheetToXML(styleMap, i, sheetElement, sheet);
-		}
-	}
-
-	private ArrayList<LinkedList<Element>> collectStyleDefinitions() {
-		// Index: style ID, Value: List of elements (cells) using that style
-		ArrayList<LinkedList<Element>> styleMap = new ArrayList<LinkedList<Element>>(
-				poiWorkbook.getNumCellStyles());
-		for (int i = 0; i < poiWorkbook.getNumCellStyles(); i++) {
-			styleMap.add(new LinkedList<Element>());
-		}
-		return styleMap;
-	}
-
-	private void describeNamedRanges(Element root) {
-		Element namedRangesElement = root.addElement("named_ranges");
-		namedRangesToXML(namedRangesElement);
-	}
-
-	private void namedRangesToXML(Element namedRangesElement) {
-		for(int i = 0; i < poiWorkbook.getNumberOfNames(); i++) {
-            Name name = poiWorkbook.getNameAt(i);            
-            try {
-            	if(!name.isDeleted() && !name.isFunctionName()) {                	
-                	String formula = name.getRefersToFormula();                	
-                	AreaReference areaReference = new AreaReference(formula);
-                    CellReference firstCellReference = areaReference.getFirstCell();
-                    CellReference lastCellReference = areaReference.getLastCell();
-                    formula = formula.replaceAll("\\p{C}", "?");
-                    
-                    Element namedRangeElement = namedRangesElement.addElement("named_range");
-                    namedRangeElement.addAttribute("first_column", String.valueOf(firstCellReference.getCol()+1));
-                    namedRangeElement.addAttribute("first_row", String.valueOf(firstCellReference.getRow()+1));
-                    namedRangeElement.addAttribute("last_column", String.valueOf(lastCellReference.getCol()+1));
-                    namedRangeElement.addAttribute("last_row", String.valueOf(lastCellReference.getRow()+1));
-                    
-                    namedRangeElement.addElement("name").setText(name.getNameName());
-                    namedRangeElement.addElement("sheet_name").setText(name.getSheetName());
-                    
-                    namedRangeElement.addElement("refers_to_formula").setText(formula);
-                }
-            }            
-            catch(RuntimeException e) {
-            	//caused by an not implemented error in POI related to macros, and some invalid formala's that dont' relate to contiguous ranges.
-            }                                    
-		}		
-	}
-
+	
 	private void sheetToXML(ArrayList<LinkedList<Element>> styleMap, int sheetIndex,
 			Element sheetElement, Sheet sheet) {
 		sheetElement.addAttribute("name", sheet.getSheetName());
@@ -295,6 +314,189 @@ public class XMLGeneration {
 					String.valueOf(sheet.getColumnWidth(x)));
 		}
 	}
+		
+	
+	private void writeNamedRanged(XMLStreamWriter xmlWriter) throws XMLStreamException {
+		xmlWriter.writeStartElement("named_ranges");
+		
+		for(int i = 0; i < poiWorkbook.getNumberOfNames(); i++) {
+            Name name = poiWorkbook.getNameAt(i);            
+            try {
+            	if(!name.isDeleted() && !name.isFunctionName()) {                	
+                	String formula = name.getRefersToFormula();                	
+                	AreaReference areaReference = new AreaReference(formula);
+                    CellReference firstCellReference = areaReference.getFirstCell();
+                    CellReference lastCellReference = areaReference.getLastCell();
+                    formula = formula.replaceAll("\\p{C}", "?");
+                    
+                    xmlWriter.writeStartElement("named_range");
+                    
+                    xmlWriter.writeAttribute("first_column", String.valueOf(firstCellReference.getCol()+1));                                       
+                    xmlWriter.writeAttribute("first_row", String.valueOf(firstCellReference.getRow()+1));
+                    xmlWriter.writeAttribute("last_column", String.valueOf(lastCellReference.getCol()+1));
+                    xmlWriter.writeAttribute("last_row", String.valueOf(lastCellReference.getRow()+1));
+                    
+                    xmlWriter.writeStartElement("name");
+                    xmlWriter.writeCharacters(name.getNameName());
+                    xmlWriter.writeEndElement();
+                    
+                    xmlWriter.writeStartElement("sheet_name");
+                    xmlWriter.writeCharacters(name.getSheetName());
+                    xmlWriter.writeEndElement();
+                    
+                    xmlWriter.writeStartElement("refers_to_formula");
+                    xmlWriter.writeCharacters(formula);
+                    xmlWriter.writeEndElement();
+                    
+                    xmlWriter.writeEndElement();                                                                              
+                }
+            }            
+            catch(RuntimeException e) {
+            	//caused by an not implemented error in POI related to macros, and some invalid formala's that dont' relate to contiguous ranges.
+            }                                    
+		}	
+		
+		xmlWriter.writeEndElement();
+	}
+	
+	private Document asXMLDocument() {
+		Namespace xmlns = new Namespace("",
+				"http://www.sysmo-db.org/2010/xml/spreadsheet");
+		QName workbookName = QName.get("workbook", xmlns);				
+		
+		Document doc = DocumentHelper.createDocument();		
+		
+		Element root = doc.addElement(workbookName);
+		
+		describeNamedRanges(root);
+
+		// Element to hold the cell styles
+		Element stylesElement = root.addElement("styles");
+		
+		ArrayList<LinkedList<Element>> styleMap = populateIntialStylesMap();
+		
+		describeSheetContents(root, styleMap);
+		
+		describeStyles(stylesElement, styleMap);		
+
+		return doc;
+	}
+
+	private void describeStyles(Element stylesElement,
+			ArrayList<LinkedList<Element>> styleMap) {
+		// Remove duplicate styles
+		Hashtable<Integer, Short> styleHashTable = new Hashtable<Integer, Short>();
+
+		// Add style info to style element
+		for (short s = 0; s < poiWorkbook.getNumCellStyles(); s++) {
+
+			// Don't bother rendering styles that aren't used in any cells!
+			if (styleMap.get(s).isEmpty())
+				continue;
+
+			CellStyle style;
+			try {
+				style = poiWorkbook.getCellStyleAt(s);
+			}
+			// Sometimes XSLX messes up and reports wrong number of
+			// styles...
+			catch (IndexOutOfBoundsException e) {
+				break;
+			}
+
+			Element styleElement = stylesElement.addElement("style");
+			styleElement.addAttribute("id", ("style" + s));
+			StyleGenerator.createStyle(style, styleElement, styleHelper);
+
+			// If we have an empty style element, its useless, so don't display
+			// it
+			if (styleElement.elements().isEmpty()) {
+				styleElement.detach();
+				// Remove "style" attributes from cells that were linked to the
+				// blank style
+				Iterator<Element> iter = styleMap.get(s).iterator();
+				while (iter.hasNext()) {
+					iter.next().addAttribute("style", null);
+				}
+			} else {
+				int styleHash = StyleGenerator.getStyleHash(styleElement);
+				// Check a duplicate style doesn't already exist, if it does,
+				// point all cells to that style and delete
+				// the duplicate
+				if (styleHashTable.containsKey(styleHash)) {
+					styleElement.detach();
+					Iterator<Element> iter = styleMap.get(s).iterator();
+					while (iter.hasNext()) {
+						iter.next().addAttribute(
+								"style",
+								"style"
+										+ styleHashTable.get(styleHash)
+												.toString());
+					}
+				} else {
+					styleHashTable.put(styleHash, s);
+				}
+			}
+		}
+	}
+
+	private void describeSheetContents(Element root,
+			ArrayList<LinkedList<Element>> styleMap) {
+		for (int i = 0; i < poiWorkbook.getNumberOfSheets(); i++) {
+			Element sheetElement = root.addElement("sheet");
+
+			Sheet sheet = poiWorkbook.getSheetAt(i);
+
+			sheetToXML(styleMap, i, sheetElement, sheet);
+		}
+	}
+	
+
+	private ArrayList<LinkedList<Element>> populateIntialStylesMap() {
+		// Index: style ID, Value: List of elements (cells) using that style
+		ArrayList<LinkedList<Element>> styleMap = new ArrayList<LinkedList<Element>>(
+				poiWorkbook.getNumCellStyles());
+		for (int i = 0; i < poiWorkbook.getNumCellStyles(); i++) {
+			styleMap.add(new LinkedList<Element>());
+		}
+		return styleMap;
+	}
+
+	private void describeNamedRanges(Element root) {
+		Element namedRangesElement = root.addElement("named_ranges");
+		namedRangesToXML(namedRangesElement);
+	}
+
+	private void namedRangesToXML(Element namedRangesElement) {
+		for(int i = 0; i < poiWorkbook.getNumberOfNames(); i++) {
+            Name name = poiWorkbook.getNameAt(i);            
+            try {
+            	if(!name.isDeleted() && !name.isFunctionName()) {                	
+                	String formula = name.getRefersToFormula();                	
+                	AreaReference areaReference = new AreaReference(formula);
+                    CellReference firstCellReference = areaReference.getFirstCell();
+                    CellReference lastCellReference = areaReference.getLastCell();
+                    formula = formula.replaceAll("\\p{C}", "?");
+                    
+                    Element namedRangeElement = namedRangesElement.addElement("named_range");
+                    namedRangeElement.addAttribute("first_column", String.valueOf(firstCellReference.getCol()+1));
+                    namedRangeElement.addAttribute("first_row", String.valueOf(firstCellReference.getRow()+1));
+                    namedRangeElement.addAttribute("last_column", String.valueOf(lastCellReference.getCol()+1));
+                    namedRangeElement.addAttribute("last_row", String.valueOf(lastCellReference.getRow()+1));
+                    
+                    namedRangeElement.addElement("name").setText(name.getNameName());
+                    namedRangeElement.addElement("sheet_name").setText(name.getSheetName());
+                    
+                    namedRangeElement.addElement("refers_to_formula").setText(formula);
+                }
+            }            
+            catch(RuntimeException e) {
+            	//caused by an not implemented error in POI related to macros, and some invalid formala's that dont' relate to contiguous ranges.
+            }                                    
+		}		
+	}
+
+	
 
 	private void dataValidationsToXML(Element validations, Sheet sheet) {
 		if (sheet instanceof HSSFSheet) {
@@ -347,6 +549,10 @@ public class XMLGeneration {
 			col = (col / 26) - 1;
 		}
 		return result;
+	}
+	
+	private Workbook getWorkbook() {
+		return poiWorkbook;
 	}
 
 }

@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -132,9 +134,10 @@ public class XMLGenerationTest {
 		assertEquals("14", matches.get(0).getText());
 	}
 
-	private Document convertToXMLDocument(XMLGeneration generator) throws IOException, DocumentException {
+	private Document convertToXMLDocument(XMLGeneration generator) throws IOException, DocumentException, XMLStreamException {
 		StringWriter out = new StringWriter();
 		generator.outputToWriter(out);
+		System.out.println(out.toString());		
 		return DocumentHelper.parseText(out.toString());
 		
 	}

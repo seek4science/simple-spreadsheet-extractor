@@ -6,20 +6,11 @@
  ******************************************************************************/
 package org.sysmodb;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Namespace;
-import org.dom4j.Node;
-import org.dom4j.XPath;
 import org.junit.Test;
 
 public class WorkbookParserXMLTest {
@@ -54,6 +45,7 @@ public class WorkbookParserXMLTest {
 		WorkbookParser p = SpreadsheetTestHelper
 				.openSpreadsheetResource("/complex_validations.xls");
 		String xml = p.asXML();
+		System.out.println(xml);
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
 

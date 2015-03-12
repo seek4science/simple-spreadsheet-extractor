@@ -13,6 +13,8 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -46,7 +48,10 @@ public class WorkbookParser {
 		} catch (IOException e) {			
 			e.printStackTrace();
 			return null;
-		}
+		} catch (XMLStreamException e) {
+			e.printStackTrace();
+			return null;
+		} 
 		return out.toString();
 	}
 
