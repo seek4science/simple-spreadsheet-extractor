@@ -25,7 +25,6 @@ import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.sysmodb.CellInfo;
-import org.sysmodb.PatchedPoi;
 
 public class XMLGeneration {
 
@@ -106,8 +105,7 @@ public class XMLGeneration {
 
 	private void writeHSSFDataValidations(XMLStreamWriter xmlWriter,
 			HSSFSheet sheet) throws XMLStreamException {
-		List<HSSFDataValidation> validationData = PatchedPoi.getInstance()
-				.getValidationData(sheet, sheet.getWorkbook());
+		List<HSSFDataValidation> validationData = sheet.getDataValidations();
 		for (HSSFDataValidation validation : validationData) {
 			for (CellRangeAddress address : validation.getRegions()
 					.getCellRangeAddresses()) {

@@ -7,23 +7,17 @@
 	<description>Simple command line app that translates a Spreadsheet file to an XML document
 
 Now with style elements</description>
-        <version>0.14.1</version>
+        <version>0.15.0</version>
 	<dependencies>
 		<dependency>
-			<groupId>org.sysmo-db</groupId>
-			<artifactId>rightfield-poi</artifactId>
-			<version>3.9</version>			
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.11</version>			
 		</dependency>		
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.9</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.poi</groupId>
-					<artifactId>poi</artifactId>					
-					</exclusion>
-			</exclusions>
+			<version>3.11</version>			
 		</dependency>	
 		<dependency>
 			<groupId>dom4j</groupId>
@@ -44,13 +38,7 @@ Now with style elements</description>
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>		
-	</dependencies>
-	<repositories>
-	  <repository>
-	    <id>local-artifacts</id>
-	    <url>file://${basedir}/local-artifacts</url>
-	  </repository>
-	</repositories>
+	</dependencies>	
 
 	<build>
 		<plugins>
