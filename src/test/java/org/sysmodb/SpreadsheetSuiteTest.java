@@ -27,7 +27,7 @@ public class SpreadsheetSuiteTest {
 	private final String ROOT = "spreadsheet_suite";
 	private static final Logger logger = Logger
 			.getLogger("SpreadsheetSuiteTest");
-	private final boolean FAIL_QUIETLY = true;
+	private final boolean FAIL_QUIETLY = false;
 
 	/**
 	 * Tests each spreadsheet resource defined by
@@ -61,6 +61,7 @@ public class SpreadsheetSuiteTest {
 		names.add("problematic_spreadsheet2.xls");
 		names.add("problematic_spreadsheet3.xls");
 		names.add("pride_template_empty.xls");
+		names.add("problem_with_dv.xls");
 
 		return names;
 	}

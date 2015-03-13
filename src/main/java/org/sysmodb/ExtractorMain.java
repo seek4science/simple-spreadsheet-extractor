@@ -11,11 +11,15 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 
+import javax.xml.stream.XMLStreamException;
+
+import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 public class ExtractorMain {
 
 	private static OptionParser options;
+	private static final Logger logger = Logger.getLogger(ExtractorMain.class);
 
 	public ExtractorMain(String[] args) {
 		processOptions(args);
@@ -30,13 +34,13 @@ public class ExtractorMain {
 			}
 
 		} catch (IOException e) {
-			System.err.println("IO Error reading data: " + e.getMessage());
-			e.printStackTrace();
+			logger.error("IO Error reading data: ",e);			
 			System.exit(-1);
-		} catch (InvalidFormatException e) {
-			System.err
-					.println("Invalid format reading data: " + e.getMessage());
-			e.printStackTrace();
+		} catch (InvalidFormatException e) {			
+			logger.error("Invaild format reading data",e);
+			System.exit(-1);
+		} catch (XMLStreamException e) {
+			logger.error("Error writing to xml stream",e);
 			System.exit(-1);
 		}
 		System.exit(0);

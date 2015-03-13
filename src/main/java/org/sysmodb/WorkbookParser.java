@@ -26,7 +26,7 @@ import org.sysmodb.xml.XMLGeneration;
  */
 public class WorkbookParser {
 
-	private Workbook poiWorkbook = null;
+	private Workbook poiWorkbook = null;	
 
 	public WorkbookParser(InputStream stream) throws IOException,
 			InvalidFormatException {
@@ -35,23 +35,17 @@ public class WorkbookParser {
 
 	}
 
-	public String asXML() {
+	public String asXML() throws IOException, XMLStreamException {
 		Writer out = new StringWriter();
 		asXML(out);
 		return out.toString();
 	}
 
-	public void asXML(Writer out) {
+	public void asXML(Writer out) throws IOException, XMLStreamException {
 
 		XMLGeneration generator = new XMLGeneration(poiWorkbook);
-		try {
-			generator.outputToWriter(out);
-			out.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (XMLStreamException e) {
-			e.printStackTrace();
-		}
+		generator.outputToWriter(out);
+		out.flush();		
 	}
 
 	public String asCSV(int sheetIndex) {

@@ -9,6 +9,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -27,6 +28,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.sysmodb.CellInfo;
 
 public class XMLGeneration {
+	
+	private final static Logger logger = Logger.getLogger(XMLGeneration.class);
 
 	private final Workbook poiWorkbook;
 	private XMLStyleHelper styleHelper = null;
@@ -105,16 +108,21 @@ public class XMLGeneration {
 
 	private void writeHSSFDataValidations(XMLStreamWriter xmlWriter,
 			HSSFSheet sheet) throws XMLStreamException {
-		List<HSSFDataValidation> validationData = sheet.getDataValidations();
-		for (HSSFDataValidation validation : validationData) {
-			for (CellRangeAddress address : validation.getRegions()
-					.getCellRangeAddresses()) {
-				String formula = validation.getValidationConstraint()
-						.getFormula1();
-				if (formula != null) {
-					writeDataValidation(xmlWriter, address, formula);
+		try {
+			List<HSSFDataValidation> validationData = sheet.getDataValidations();
+			for (HSSFDataValidation validation : validationData) {
+				for (CellRangeAddress address : validation.getRegions()
+						.getCellRangeAddresses()) {
+					String formula = validation.getValidationConstraint()
+							.getFormula1();
+					if (formula != null) {
+						writeDataValidation(xmlWriter, address, formula);
+					}
 				}
 			}
+		}
+		catch(IllegalStateException e) {
+			logger.warn("Problem reading data validation table " + e.getMessage());
 		}
 	}
 
