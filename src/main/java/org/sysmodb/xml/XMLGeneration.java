@@ -25,6 +25,8 @@ import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.xerces.util.XMLChar;
+import org.apache.xerces.xni.XMLString;
 import org.sysmodb.CellInfo;
 
 public class XMLGeneration {
@@ -48,7 +50,7 @@ public class XMLGeneration {
 			XMLStreamException {
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		XMLStreamWriter xmlwriter = factory.createXMLStreamWriter(outputWriter);
-		xmlwriter.writeStartDocument();
+		xmlwriter.writeStartDocument("1.0");
 		streamXML(xmlwriter);
 		xmlwriter.writeEndDocument();
 
@@ -252,12 +254,29 @@ public class XMLGeneration {
 						xmlWriter.writeAttribute("formula",
 								stripControlCharacters(info.formula));
 					}
-					xmlWriter.writeCharacters(info.value);
+					xmlWriter.writeCharacters(xml10Characters(info.value));
 					xmlWriter.writeEndElement();
 
 				}
 			}
 		}
+	}
+	
+	/** 
+	 * 
+	 * @param original
+	 * @return the same String but with XML 1.0 invalid characters (like form feed) removed
+	 */
+	private String xml10Characters(String original) {
+		//TODO: this would be better incorporating into an custom version of XMLStreamWriter.writeCharacters
+		String result = "";
+		for (int i=0;i<original.length();i++) {
+			char c = original.charAt(i);
+			if (XMLChar.isValid(c)) {
+				result += c;
+			}
+		}
+		return result;
 	}
 
 	private void writeNamedRanged(XMLStreamWriter xmlWriter)

@@ -43,8 +43,8 @@ public class SpreadsheetSuiteTest {
 						+ ROOT + "/" + name);
 				assertNotNull(resourceURL);
 				InputStream stream = resourceURL.openStream();
-				WorkbookParser p = new WorkbookParser(stream);
-				String xml = p.asXML();
+				WorkbookParser p = new WorkbookParser(stream);				
+				String xml = p.asXML();								
 				SpreadsheetTestHelper.validateAgainstSchema(xml);
 			} catch (Exception e) {
 				logger.severe("Error parsing " + name + " - " + e.getMessage());
@@ -61,8 +61,8 @@ public class SpreadsheetSuiteTest {
 		names.add("problematic_spreadsheet2.xls");
 		names.add("problematic_spreadsheet3.xls");
 		names.add("pride_template_empty.xls");
-		names.add("problem_with_dv.xls");
-
+		names.add("xml-unfriendly-chars.xlsx");
+		names.add("chars-that-need-escaping.xlsx");
 		return names;
 	}
 
