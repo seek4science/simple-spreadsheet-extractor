@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 
 /**
@@ -20,37 +21,37 @@ import org.apache.poi.ss.usermodel.CellStyle;
  * @author Finn
  */
 public abstract class XMLStyleGenerator {
-	private static final Map<Short, String> BORDERS = createBorderMap();
+	private static final Map<BorderStyle, String> BORDERS = createBorderMap();
 
-	private static Map<Short, String> createBorderMap() {
-		Map<Short, String> result = new HashMap<Short, String>();
-		result.put(CellStyle.BORDER_DASHED, "dashed 1pt");
-		result.put(CellStyle.BORDER_DASH_DOT, "dashed 1pt");
-		result.put(CellStyle.BORDER_DASH_DOT_DOT, "dashed 1pt");
-		result.put(CellStyle.BORDER_DOTTED, "dotted 1pt");
-		result.put(CellStyle.BORDER_DOUBLE, "double 3pt");
-		result.put(CellStyle.BORDER_HAIR, "solid 1pt");
-		result.put(CellStyle.BORDER_MEDIUM, "2pt solid");
-		result.put(CellStyle.BORDER_MEDIUM_DASHED, "2pt dashed");
-		result.put(CellStyle.BORDER_MEDIUM_DASH_DOT, "2pt dashed");
-		result.put(CellStyle.BORDER_MEDIUM_DASH_DOT_DOT, "2pt dashed");
-		result.put(CellStyle.BORDER_NONE, "none");
-		result.put(CellStyle.BORDER_SLANTED_DASH_DOT, "dashed 2pt");
-		result.put(CellStyle.BORDER_THICK, "solid 3pt");
-		result.put(CellStyle.BORDER_THIN, "dashed 1pt");
+	private static Map<BorderStyle, String> createBorderMap() {
+		Map<BorderStyle, String> result = new HashMap<BorderStyle, String>();
+		result.put(BorderStyle.DASHED, "dashed 1pt");
+		result.put(BorderStyle.DASH_DOT, "dashed 1pt");
+		result.put(BorderStyle.DASH_DOT_DOT, "dashed 1pt");
+		result.put(BorderStyle.DOTTED, "dotted 1pt");
+		result.put(BorderStyle.DOUBLE, "double 3pt");
+		result.put(BorderStyle.HAIR, "solid 1pt");
+		result.put(BorderStyle.MEDIUM, "2pt solid");
+		result.put(BorderStyle.MEDIUM_DASHED, "2pt dashed");
+		result.put(BorderStyle.MEDIUM_DASH_DOT, "2pt dashed");
+		result.put(BorderStyle.MEDIUM_DASH_DOT_DOT, "2pt dashed");
+		result.put(BorderStyle.NONE, "none");
+		result.put(BorderStyle.SLANTED_DASH_DOT, "dashed 2pt");
+		result.put(BorderStyle.THICK, "solid 3pt");
+		result.put(BorderStyle.THIN, "dashed 1pt");
 
 		return Collections.unmodifiableMap(result);
 	}
 
 	public static boolean isStyleEmpty(CellStyle style, XMLStyleHelper helper) {
 
-		if (BORDERS.get(style.getBorderTop()) != "none")
+		if (style.getBorderTopEnum() != BorderStyle.NONE)
 			return false;
-		if (BORDERS.get(style.getBorderBottom()) != "none")
+		if (style.getBorderBottomEnum() != BorderStyle.NONE)
 			return false;
-		if (BORDERS.get(style.getBorderLeft()) != "none")
+		if (style.getBorderLeftEnum() != BorderStyle.NONE)
 			return false;
-		if (BORDERS.get(style.getBorderRight()) != "none")
+		if (style.getBorderRightEnum() != BorderStyle.NONE)
 			return false;
 
 		// Background/fill colour
@@ -65,25 +66,25 @@ public abstract class XMLStyleGenerator {
 		String border = "none";
 		xmlWriter.writeStartElement("style");
 		xmlWriter.writeAttribute("id", "style" + style.getIndex());
-		if ((border = BORDERS.get(style.getBorderTop())) != "none") {
+		if ((border = BORDERS.get(style.getBorderTopEnum())) != "none") {
 			xmlWriter.writeStartElement("border-top");
 			xmlWriter.writeCharacters(border);
 			xmlWriter.writeEndElement();
 		}
 
-		if ((border = BORDERS.get(style.getBorderBottom())) != "none") {
+		if ((border = BORDERS.get(style.getBorderBottomEnum())) != "none") {
 			xmlWriter.writeStartElement("border-bottom");
 			xmlWriter.writeCharacters(border);
 			xmlWriter.writeEndElement();
 		}
 
-		if ((border = BORDERS.get(style.getBorderLeft())) != "none") {
+		if ((border = BORDERS.get(style.getBorderLeftEnum())) != "none") {
 			xmlWriter.writeStartElement("border-left");
 			xmlWriter.writeCharacters(border);
 			xmlWriter.writeEndElement();
 		}
 
-		if ((border = BORDERS.get(style.getBorderRight())) != "none") {
+		if ((border = BORDERS.get(style.getBorderRightEnum())) != "none") {
 			xmlWriter.writeStartElement("border-right");
 			xmlWriter.writeCharacters(border);
 			xmlWriter.writeEndElement();

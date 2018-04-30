@@ -11,6 +11,7 @@ import java.util.Date;
 
 import org.apache.poi.ss.formula.FormulaParseException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -29,21 +30,21 @@ public class CellInfo {
 			type = "blank";
 			formula = null;
 		} else {
-			readCellValueAndType(cell.getCellType(), cell);
+			readCellValueAndType(cell.getCellTypeEnum(), cell);
 		}
 	}
 
-	private void readCellValueAndType(int cellType, Cell cell) {
+	private void readCellValueAndType(CellType cellType, Cell cell) {
 		switch (cellType) {
-		case Cell.CELL_TYPE_BLANK:
+		case BLANK:
 			value = "";
 			type = "blank";
 			break;
-		case Cell.CELL_TYPE_BOOLEAN:
+		case BOOLEAN:
 			value = String.valueOf(cell.getBooleanCellValue());
 			type = "boolean";
 			break;
-		case Cell.CELL_TYPE_NUMERIC:
+		case NUMERIC:
 			if (DateUtil.isCellDateFormatted(cell)) {
 				type = "datetime";
 				Date dateCellValue = cell.getDateCellValue();
@@ -59,18 +60,22 @@ public class CellInfo {
 				type = "numeric";
 			}
 			break;
-		case Cell.CELL_TYPE_STRING:
+		case STRING:
 			value = cell.getStringCellValue();
 			type = "string";
 			break;
-		case Cell.CELL_TYPE_FORMULA:
+		case FORMULA:
 			try {
 				formula = cell.getCellFormula();
 			} catch (FormulaParseException e) {
 
 			}
-			int resultCellType = cell.getCachedFormulaResultType();
+			CellType resultCellType = cell.getCachedFormulaResultTypeEnum();
 			readCellValueAndType(resultCellType, cell);
+			break;		
+		default:
+			value = "";
+			type = "none";
 			break;
 		}
 	}

@@ -14,6 +14,7 @@ import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFPalette;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.ss.usermodel.CellStyle;
 
 /**
@@ -26,7 +27,7 @@ public class HSSFXMLStyleHelper implements XMLStyleHelper {
 	private static HSSFWorkbook workbook;
 	private static HSSFPalette palette;
 
-	private static final HSSFColor HSSF_AUTO = new HSSFColor.AUTOMATIC();
+	private static final HSSFColor HSSF_AUTO = HSSFColorPredefined.AUTOMATIC.getColor();
 
 	public HSSFXMLStyleHelper(HSSFWorkbook wb) {
 		workbook = wb;
@@ -40,7 +41,7 @@ public class HSSFXMLStyleHelper implements XMLStyleHelper {
 	public boolean areFontsEmpty(CellStyle style) {
 		HSSFCellStyle newStyle = (HSSFCellStyle) style;
 		HSSFFont font = newStyle.getFont(workbook);
-		if (font.getBoldweight() == HSSFFont.BOLDWEIGHT_BOLD)
+		if (font.getBold())
 			return false;
 		if (font.getItalic())
 			return false;
@@ -67,7 +68,7 @@ public class HSSFXMLStyleHelper implements XMLStyleHelper {
 			throws XMLStreamException {
 		HSSFCellStyle newStyle = (HSSFCellStyle) style;
 		HSSFFont font = newStyle.getFont(workbook);
-		if (font.getBoldweight() == HSSFFont.BOLDWEIGHT_BOLD) {
+		if (font.getBold()) {
 			xmlWriter.writeStartElement("font-weight");
 			xmlWriter.writeCharacters("bold");
 			xmlWriter.writeEndElement();

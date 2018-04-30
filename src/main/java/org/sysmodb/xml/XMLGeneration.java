@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.AreaReference;
+import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Name;
@@ -26,7 +26,6 @@ import org.apache.poi.xssf.usermodel.XSSFDataValidation;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.xerces.util.XMLChar;
-import org.apache.xerces.xni.XMLString;
 import org.sysmodb.CellInfo;
 
 public class XMLGeneration {
@@ -288,7 +287,7 @@ public class XMLGeneration {
 			try {
 				if (!name.isDeleted() && !name.isFunctionName()) {
 					String formula = name.getRefersToFormula();
-					AreaReference areaReference = new AreaReference(formula);
+					AreaReference areaReference = new AreaReference(formula,getWorkbook().getSpreadsheetVersion());
 					CellReference firstCellReference = areaReference
 							.getFirstCell();
 					CellReference lastCellReference = areaReference
