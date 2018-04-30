@@ -60,8 +60,10 @@ public class XMLGeneration {
 		xmlWriter.writeStartElement("workbook");
 		xmlWriter.writeDefaultNamespace("http://www.sysmo-db.org/2010/xml/spreadsheet");
 		writeNamedRanged(xmlWriter);
+		xmlWriter.flush();
 		writeStyles(xmlWriter);
-		writeSheets(xmlWriter);
+		xmlWriter.flush();
+		writeSheets(xmlWriter);		
 		xmlWriter.writeEndElement();
 	}
 
@@ -70,6 +72,7 @@ public class XMLGeneration {
 		for (short i = 0; i < poiWorkbook.getNumberOfSheets(); i++) {
 			Sheet sheet = poiWorkbook.getSheetAt(i);
 			writeSheet(xmlWriter, i, sheet);
+			xmlWriter.flush();
 		}
 	}
 
