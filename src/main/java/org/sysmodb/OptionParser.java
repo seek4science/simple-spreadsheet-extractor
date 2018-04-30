@@ -16,8 +16,7 @@ public class OptionParser {
 	private int sheet = -1;
 	private boolean trim = false;
 
-	private static List<String> VALID_FORMATS = Arrays.asList(new String[] {
-			"xml", "csv" });
+	private static List<String> VALID_FORMATS = Arrays.asList(new String[] { "xml", "csv" });
 
 	public OptionParser(String[] args) throws InvalidOptionException {
 		for (int i = 0; i < args.length; i++) {
@@ -34,8 +33,7 @@ public class OptionParser {
 			} else if (arg.equals("-t")) {
 				trim = true;
 			} else {
-				throw new InvalidOptionException("Unrecognised option: "
-						+ args[i]);
+				throw new InvalidOptionException("Unrecognised option: " + args[i]);
 			}
 		}
 		// if CSV format and sheet is not defined, then defaults to the first
@@ -69,8 +67,7 @@ public class OptionParser {
 		try {
 			this.sheet = Integer.parseInt(sheet);
 		} catch (NumberFormatException e) {
-			throw new InvalidOptionException("Invalid sheet number supplied: '"
-					+ sheet + "'");
+			throw new InvalidOptionException("Invalid sheet number supplied: '" + sheet + "'");
 		}
 	}
 

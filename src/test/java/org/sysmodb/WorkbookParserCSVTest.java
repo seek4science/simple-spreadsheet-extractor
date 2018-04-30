@@ -23,8 +23,7 @@ public class WorkbookParserCSVTest {
 
 	@Test
 	public void testAsCSVAnotherSheet() throws Exception {
-		URL resourceURL = WorkbookParserCSVTest.class
-				.getResource("/test-spreadsheet-for-csv.xls");
+		URL resourceURL = WorkbookParserCSVTest.class.getResource("/test-spreadsheet-for-csv.xls");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
 		WorkbookParser p = new WorkbookParser(stream);
@@ -36,8 +35,7 @@ public class WorkbookParserCSVTest {
 
 	@Test
 	public void testCSVWithBlankRow() throws Exception {
-		URL resourceURL = WorkbookParserCSVTest.class
-				.getResource("/test-spreadsheet-for-csv.xls");
+		URL resourceURL = WorkbookParserCSVTest.class.getResource("/test-spreadsheet-for-csv.xls");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
 		WorkbookParser p = new WorkbookParser(stream);
@@ -50,8 +48,7 @@ public class WorkbookParserCSVTest {
 
 	@Test
 	public void testAsCSVTrimmed() throws Exception {
-		URL resourceURL = WorkbookParserCSVTest.class
-				.getResource("/test-spreadsheet-for-csv.xls");
+		URL resourceURL = WorkbookParserCSVTest.class.getResource("/test-spreadsheet-for-csv.xls");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
 		WorkbookParser p = new WorkbookParser(stream);
@@ -69,8 +66,7 @@ public class WorkbookParserCSVTest {
 
 		char[] buffer = new char[1024];
 
-		Reader reader = new BufferedReader(new InputStreamReader(
-				resourceURL.openStream(), "UTF-8"));
+		Reader reader = new BufferedReader(new InputStreamReader(resourceURL.openStream(), "UTF-8"));
 		int n;
 		while ((n = reader.read(buffer)) != -1) {
 			writer.write(buffer, 0, n);

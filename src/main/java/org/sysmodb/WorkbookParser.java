@@ -26,10 +26,9 @@ import org.sysmodb.xml.XMLGeneration;
  */
 public class WorkbookParser {
 
-	private Workbook poiWorkbook = null;	
+	private Workbook poiWorkbook = null;
 
-	public WorkbookParser(InputStream stream) throws IOException,
-			InvalidFormatException {
+	public WorkbookParser(InputStream stream) throws IOException, InvalidFormatException {
 
 		poiWorkbook = WorkbookFactory.create(stream);
 
@@ -45,7 +44,7 @@ public class WorkbookParser {
 
 		XMLGeneration generator = new XMLGeneration(poiWorkbook);
 		generator.outputToWriter(out);
-		out.flush();		
+		out.flush();
 	}
 
 	public String asCSV(int sheetIndex) {
@@ -59,15 +58,14 @@ public class WorkbookParser {
 	}
 
 	public void asCSV(Writer out, int sheetIndex, boolean trim) {
-		CSVGeneration generator = new CSVGeneration(poiWorkbook, sheetIndex,
-				trim);
+		CSVGeneration generator = new CSVGeneration(poiWorkbook, sheetIndex, trim);
 		try {
 			generator.outputToWriter(out);
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public Workbook getWorkbook() {

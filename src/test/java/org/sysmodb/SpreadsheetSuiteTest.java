@@ -25,8 +25,7 @@ import org.junit.Test;
  */
 public class SpreadsheetSuiteTest {
 	private final String ROOT = "spreadsheet_suite";
-	private static final Logger logger = Logger
-			.getLogger("SpreadsheetSuiteTest");
+	private static final Logger logger = Logger.getLogger("SpreadsheetSuiteTest");
 	private final boolean FAIL_QUIETLY = false;
 
 	/**
@@ -39,12 +38,11 @@ public class SpreadsheetSuiteTest {
 		for (String name : getSpreadsheetResourceNames()) {
 			System.out.println(name);
 			try {
-				URL resourceURL = WorkbookParserXMLTest.class.getResource("/"
-						+ ROOT + "/" + name);
+				URL resourceURL = WorkbookParserXMLTest.class.getResource("/" + ROOT + "/" + name);
 				assertNotNull(resourceURL);
 				InputStream stream = resourceURL.openStream();
-				WorkbookParser p = new WorkbookParser(stream);				
-				String xml = p.asXML();								
+				WorkbookParser p = new WorkbookParser(stream);
+				String xml = p.asXML();
 				SpreadsheetTestHelper.validateAgainstSchema(xml);
 			} catch (Exception e) {
 				logger.severe("Error parsing " + name + " - " + e.getMessage());

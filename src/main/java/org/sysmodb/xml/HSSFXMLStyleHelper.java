@@ -48,15 +48,12 @@ public class HSSFXMLStyleHelper implements XMLStyleHelper {
 		if (font.getUnderline() != HSSFFont.U_NONE)
 			return false;
 		// Ignore same-ish defaults
-		if (font.getFontHeightInPoints() != 10
-				&& font.getFontHeightInPoints() != 11)
+		if (font.getFontHeightInPoints() != 10 && font.getFontHeightInPoints() != 11)
 			return false;
 		// Arial is default for Excel, Calibri is default for OO
-		if (!font.getFontName().equals("Arial")
-				&& !font.getFontName().equals("Calibri"))
+		if (!font.getFontName().equals("Arial") && !font.getFontName().equals("Calibri"))
 			return false;
-		if ((font.getColor() != HSSFFont.COLOR_NORMAL)
-				&& (getRGBString(font.getColor()) != null)
+		if ((font.getColor() != HSSFFont.COLOR_NORMAL) && (getRGBString(font.getColor()) != null)
 				&& !getRGBString(font.getColor()).equals("#000"))
 			return false;
 
@@ -64,8 +61,7 @@ public class HSSFXMLStyleHelper implements XMLStyleHelper {
 	}
 
 	@Override
-	public void writeFontProperties(XMLStreamWriter xmlWriter, CellStyle style)
-			throws XMLStreamException {
+	public void writeFontProperties(XMLStreamWriter xmlWriter, CellStyle style) throws XMLStreamException {
 		HSSFCellStyle newStyle = (HSSFCellStyle) style;
 		HSSFFont font = newStyle.getFont(workbook);
 		if (font.getBold()) {
@@ -84,22 +80,18 @@ public class HSSFXMLStyleHelper implements XMLStyleHelper {
 			xmlWriter.writeEndElement();
 		}
 		// Ignore same-ish defaults
-		if (font.getFontHeightInPoints() != 10
-				&& font.getFontHeightInPoints() != 11) {
+		if (font.getFontHeightInPoints() != 10 && font.getFontHeightInPoints() != 11) {
 			xmlWriter.writeStartElement("font-size");
-			xmlWriter.writeCharacters(String.valueOf(font
-					.getFontHeightInPoints() + "pt"));
+			xmlWriter.writeCharacters(String.valueOf(font.getFontHeightInPoints() + "pt"));
 			xmlWriter.writeEndElement();
 		}
 		// Arial is default for Excel, Calibri is default for OO
-		if (!font.getFontName().equals("Arial")
-				&& !font.getFontName().equals("Calibri")) {
+		if (!font.getFontName().equals("Arial") && !font.getFontName().equals("Calibri")) {
 			xmlWriter.writeStartElement("font-family");
 			xmlWriter.writeCharacters(font.getFontName());
 			xmlWriter.writeEndElement();
 		}
-		if ((font.getColor() != HSSFFont.COLOR_NORMAL)
-				&& (getRGBString(font.getColor()) != null)
+		if ((font.getColor() != HSSFFont.COLOR_NORMAL) && (getRGBString(font.getColor()) != null)
 				&& !getRGBString(font.getColor()).equals("#000")) {
 			xmlWriter.writeStartElement("color");
 			xmlWriter.writeCharacters(getRGBString(font.getColor()));

@@ -29,18 +29,17 @@ public class ExtractorMain {
 				workbook.asXML(new OutputStreamWriter(System.out));
 			}
 			if (options.getOutputFormat().equals("csv")) {
-				workbook.asCSV(new OutputStreamWriter(System.out),
-						options.getSheet(), options.getTrim());
+				workbook.asCSV(new OutputStreamWriter(System.out), options.getSheet(), options.getTrim());
 			}
 
 		} catch (IOException e) {
-			logger.error("IO Error reading data: ",e);			
+			logger.error("IO Error reading data: ", e);
 			System.exit(-1);
-		} catch (InvalidFormatException e) {			
-			logger.error("Invaild format reading data",e);
+		} catch (InvalidFormatException e) {
+			logger.error("Invaild format reading data", e);
 			System.exit(-1);
 		} catch (XMLStreamException e) {
-			logger.error("Error writing to xml stream",e);
+			logger.error("Error writing to xml stream", e);
 			System.exit(-1);
 		}
 		System.exit(0);

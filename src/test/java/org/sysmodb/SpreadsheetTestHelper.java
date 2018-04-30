@@ -19,8 +19,7 @@ import org.xml.sax.InputSource;
 
 public class SpreadsheetTestHelper {
 
-	public static WorkbookParser openSpreadsheetResource(String resourceName)
-			throws Exception {
+	public static WorkbookParser openSpreadsheetResource(String resourceName) throws Exception {
 		URL resourceURL = SpreadsheetTestHelper.class.getResource(resourceName);
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
@@ -29,17 +28,12 @@ public class SpreadsheetTestHelper {
 	}
 
 	public static void validateAgainstSchema(String xml) throws Exception {
-		URL resource = WorkbookParserXMLTest.class
-				.getResource("/schema-v1.xsd");
+		URL resource = WorkbookParserXMLTest.class.getResource("/schema-v1.xsd");
 		SAXReader reader = new SAXReader(true);
-		reader.setFeature("http://apache.org/xml/features/validation/schema",
-				true);
-		reader.setProperty(
-				"http://java.sun.com/xml/jaxp/properties/schemaLanguage",
+		reader.setFeature("http://apache.org/xml/features/validation/schema", true);
+		reader.setProperty("http://java.sun.com/xml/jaxp/properties/schemaLanguage",
 				"http://www.w3.org/2001/XMLSchema");
-		reader.setProperty(
-				"http://java.sun.com/xml/jaxp/properties/schemaSource",
-				new File(resource.getFile()));
+		reader.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource", new File(resource.getFile()));
 		InputSource source = new InputSource(new StringReader(xml));
 		source.setEncoding("UTF-8");
 		try {

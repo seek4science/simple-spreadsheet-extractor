@@ -49,8 +49,7 @@ public class XSSFXMLStyleHelper implements XMLStyleHelper {
 	}
 
 	@Override
-	public void writeFontProperties(XMLStreamWriter xmlWriter, CellStyle style)
-			throws XMLStreamException {
+	public void writeFontProperties(XMLStreamWriter xmlWriter, CellStyle style) throws XMLStreamException {
 		XSSFCellStyle newStyle = (XSSFCellStyle) style;
 		XSSFFont font = newStyle.getFont();
 		if (font.getBold()) {
@@ -70,8 +69,7 @@ public class XSSFXMLStyleHelper implements XMLStyleHelper {
 		}
 		if (font.getFontHeight() != XSSFFont.DEFAULT_FONT_SIZE) {
 			xmlWriter.writeStartElement("font-size");
-			xmlWriter.writeCharacters(String.valueOf(font
-					.getFontHeightInPoints()) + "pt");
+			xmlWriter.writeCharacters(String.valueOf(font.getFontHeightInPoints()) + "pt");
 			xmlWriter.writeEndElement();
 		}
 

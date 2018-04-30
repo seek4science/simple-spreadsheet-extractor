@@ -17,8 +17,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 public class CellInfo {
 
-	private final static SimpleDateFormat dateFormatter = new SimpleDateFormat(
-			"yyyy-MM-dd'T'H:m:sZ");
+	private final static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'H:m:sZ");
 
 	public String type;
 	public String value;
@@ -72,7 +71,7 @@ public class CellInfo {
 			}
 			CellType resultCellType = cell.getCachedFormulaResultTypeEnum();
 			readCellValueAndType(resultCellType, cell);
-			break;		
+			break;
 		default:
 			value = "";
 			type = "none";

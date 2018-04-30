@@ -33,8 +33,7 @@ public class CSVGeneration {
 		int lastCol = -1;
 		int firstRow = 0;
 		int firstCol = 0;
-		List<String> stringRowTypes = Arrays.asList(new String[] { "string",
-				"datetime" });
+		List<String> stringRowTypes = Arrays.asList(new String[] { "string", "datetime" });
 
 		if (trim) {
 			firstRow = sheet.getFirstRowNum();

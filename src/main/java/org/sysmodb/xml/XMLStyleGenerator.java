@@ -61,8 +61,8 @@ public abstract class XMLStyleGenerator {
 		return helper.areFontsEmpty(style);
 	}
 
-	public static void writeStyle(XMLStreamWriter xmlWriter, CellStyle style,
-			XMLStyleHelper helper) throws XMLStreamException {
+	public static void writeStyle(XMLStreamWriter xmlWriter, CellStyle style, XMLStyleHelper helper)
+			throws XMLStreamException {
 		String border = "none";
 		xmlWriter.writeStartElement("style");
 		xmlWriter.writeAttribute("id", "style" + style.getIndex());

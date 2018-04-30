@@ -17,8 +17,7 @@ public class WorkbookParserXMLTest {
 
 	@Test
 	public void testConstruct() throws Exception {
-		URL resourceURL = WorkbookParserXMLTest.class
-				.getResource("/test-spreadsheet.xls");
+		URL resourceURL = WorkbookParserXMLTest.class.getResource("/test-spreadsheet.xls");
 		assertNotNull(resourceURL);
 		InputStream stream = resourceURL.openStream();
 		new WorkbookParser(stream);
@@ -26,40 +25,35 @@ public class WorkbookParserXMLTest {
 
 	@Test
 	public void testValidateXML() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/test-spreadsheet.xls");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/test-spreadsheet.xls");
 		String xml = p.asXML();
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
 
 	@Test
 	public void testValidateAnnotatedXML() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/simple_annotated_book.xls");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/simple_annotated_book.xls");
 		String xml = p.asXML();
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
 
 	@Test
 	public void testValidateXLSWithComplexValidations() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/complex_validations.xls");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/complex_validations.xls");
 		String xml = p.asXML();
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
 	}
 
 	@Test
 	public void testAsXMLForXLSX() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/test-spreadsheet.xlsx");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/test-spreadsheet.xlsx");
 		assertNotNull(p.asXML());
 		SpreadsheetTestHelper.validateAgainstSchema(p.asXML());
 	}
 
 	@Test
 	public void testJERMTemplatesParsableXLS() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/metabolites_intracellular.xls");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/metabolites_intracellular.xls");
 		String xml = p.asXML();
 		assertNotNull(xml);
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
@@ -67,8 +61,7 @@ public class WorkbookParserXMLTest {
 
 	@Test
 	public void testJERMTemplatesParsableXLSX() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/metabolites_intracellular.xlsx");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/metabolites_intracellular.xlsx");
 		String xml = p.asXML();
 		assertNotNull(xml);
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
@@ -76,8 +69,7 @@ public class WorkbookParserXMLTest {
 
 	@Test
 	public void testValidatedSheet() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/validated_spreadsheet.xls");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/validated_spreadsheet.xls");
 		String xml = p.asXML();
 		assertNotNull(xml);
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
@@ -89,8 +81,7 @@ public class WorkbookParserXMLTest {
 		// The parser throws error on the cells which the same formula is pulled
 		// down
 		// Happnes on MS excel
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/unknown_formula.xlsx");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/unknown_formula.xlsx");
 		String xml = p.asXML();
 		assertNotNull(xml);
 		SpreadsheetTestHelper.validateAgainstSchema(xml);

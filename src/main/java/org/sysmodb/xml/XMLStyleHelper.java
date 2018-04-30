@@ -21,6 +21,5 @@ public interface XMLStyleHelper {
 
 	boolean areFontsEmpty(CellStyle style);
 
-	void writeFontProperties(XMLStreamWriter xmlWriter, CellStyle style)
-			throws XMLStreamException;
+	void writeFontProperties(XMLStreamWriter xmlWriter, CellStyle style) throws XMLStreamException;
 }

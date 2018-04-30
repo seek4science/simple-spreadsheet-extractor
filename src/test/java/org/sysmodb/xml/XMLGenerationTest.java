@@ -25,15 +25,13 @@ public class XMLGenerationTest {
 
 	@Test
 	public void testAsDocumentSanity() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/test-spreadsheet.xls");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/test-spreadsheet.xls");
 		assertNotNull(convertToXMLDocument(new XMLGeneration(p.getWorkbook())));
 	}
 
 	@Test
 	public void testDataValidationsXLS() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/simple_annotated_book.xls");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/simple_annotated_book.xls");
 		assertNotNull(convertToXMLDocument(new XMLGeneration(p.getWorkbook())));
 		String xml = p.asXML();
 		SpreadsheetTestHelper.validateAgainstSchema(xml);
@@ -41,24 +39,20 @@ public class XMLGenerationTest {
 
 	@Test
 	public void testAsDocumentSanityXLSX() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/test-spreadsheet.xlsx");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/test-spreadsheet.xlsx");
 		assertNotNull(convertToXMLDocument(new XMLGeneration(p.getWorkbook())));
 	}
 
 	@Test
 	public void testNumberFormatting() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/numbers_and_strings.xls");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/numbers_and_strings.xls");
 		Document doc = convertToXMLDocument(new XMLGeneration(p.getWorkbook()));
 		Namespace defNamespace = doc.getRootElement().getNamespace();
 		doc.getRootElement().addNamespace("bbb", defNamespace.getURI());
 		Map<String, String> namespaceURIs = new HashMap<String, String>();
 		namespaceURIs.put("bbb", defNamespace.getURI());
-		String[] expected = new String[] { "49", "49", "49", "49.95", "49.95",
-				"49.95" };
-		XPath xpath = DocumentHelper
-				.createXPath("//bbb:cell[@column_alpha='B']");
+		String[] expected = new String[] { "49", "49", "49", "49.95", "49.95", "49.95" };
+		XPath xpath = DocumentHelper.createXPath("//bbb:cell[@column_alpha='B']");
 		@SuppressWarnings("unchecked")
 		List<Node> nodes = xpath.selectNodes(doc);
 		int i = 0;
@@ -70,8 +64,7 @@ public class XMLGenerationTest {
 
 	@Test
 	public void testColumnAlphaValues() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/test-spreadsheet.xls");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/test-spreadsheet.xls");
 		Document doc = convertToXMLDocument(new XMLGeneration(p.getWorkbook()));
 
 		Namespace defNamespace = doc.getRootElement().getNamespace();
@@ -80,8 +73,7 @@ public class XMLGenerationTest {
 		namespaceURIs.put("bbb", defNamespace.getURI());
 		String[] expected = new String[] { "AA", "AB", "BA", "BB", "BC" };
 		for (String exp : expected) {
-			XPath xpath = DocumentHelper
-					.createXPath("//bbb:cell[@column_alpha='" + exp + "']");
+			XPath xpath = DocumentHelper.createXPath("//bbb:cell[@column_alpha='" + exp + "']");
 			xpath.setNamespaceURIs(namespaceURIs);
 			@SuppressWarnings("unchecked")
 			List<Node> matches = xpath.selectNodes(doc);
@@ -93,25 +85,21 @@ public class XMLGenerationTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testNumberOfColumns() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/test-spreadsheet.xls");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/test-spreadsheet.xls");
 		Document doc = convertToXMLDocument(new XMLGeneration(p.getWorkbook()));
 
 		Namespace defNamespace = doc.getRootElement().getNamespace();
 		doc.getRootElement().addNamespace("bbb", defNamespace.getURI());
 		Map<String, String> namespaceURIs = new HashMap<String, String>();
 		namespaceURIs.put("bbb", defNamespace.getURI());
-		XPath xpath = DocumentHelper
-				.createXPath("//bbb:sheet[@index=\"1\"]//bbb:column");
+		XPath xpath = DocumentHelper.createXPath("//bbb:sheet[@index=\"1\"]//bbb:column");
 		xpath.setNamespaceURIs(namespaceURIs);
 		List<Node> matches = xpath.selectNodes(doc);
 		assertEquals(55, matches.size());
 		for (int n = 0; n < matches.size(); n++) {
-			assertEquals(String.valueOf(n + 1), matches.get(n)
-					.valueOf("@index"));
+			assertEquals(String.valueOf(n + 1), matches.get(n).valueOf("@index"));
 		}
-		xpath = DocumentHelper
-				.createXPath("//bbb:sheet[@index=\"1\"]//bbb:columns");
+		xpath = DocumentHelper.createXPath("//bbb:sheet[@index=\"1\"]//bbb:columns");
 		matches = xpath.selectNodes(doc);
 		assertEquals("1", matches.get(0).valueOf("@first_column"));
 		assertEquals("55", matches.get(0).valueOf("@last_column"));
@@ -119,8 +107,7 @@ public class XMLGenerationTest {
 
 	@Test
 	public void testFormulaEvaluation() throws Exception {
-		WorkbookParser p = SpreadsheetTestHelper
-				.openSpreadsheetResource("/test-spreadsheet.xls");
+		WorkbookParser p = SpreadsheetTestHelper.openSpreadsheetResource("/test-spreadsheet.xls");
 		Document doc = convertToXMLDocument(new XMLGeneration(p.getWorkbook()));
 
 		Namespace defNamespace = doc.getRootElement().getNamespace();
