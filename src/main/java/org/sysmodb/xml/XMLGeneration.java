@@ -45,7 +45,7 @@ public class XMLGeneration {
 		}
 	}
 
-	public void outputToWriter(Writer outputWriter) throws IOException, XMLStreamException {
+	public void outputToWriter(Writer outputWriter) throws IOException, XMLStreamException {		
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		XMLStreamWriter xmlwriter = factory.createXMLStreamWriter(outputWriter);
 		xmlwriter.writeStartDocument("1.0");
@@ -86,9 +86,9 @@ public class XMLGeneration {
 		writeDataValidations(xmlWriter, sheet);
 
 		writeColumns(xmlWriter, sheet);
-
+		
 		writeRows(xmlWriter, sheet);
-
+		
 		xmlWriter.writeEndElement();
 
 	}
@@ -258,8 +258,8 @@ public class XMLGeneration {
 	private void writeNamedRanged(XMLStreamWriter xmlWriter) throws XMLStreamException {
 		xmlWriter.writeStartElement("named_ranges");
 
-		for (int i = 0; i < poiWorkbook.getNumberOfNames(); i++) {
-			Name name = poiWorkbook.getNameAt(i);
+		for (Name name : poiWorkbook.getAllNames()) {
+			
 			try {
 				if (!name.isDeleted() && !name.isFunctionName()) {
 					String formula = name.getRefersToFormula();

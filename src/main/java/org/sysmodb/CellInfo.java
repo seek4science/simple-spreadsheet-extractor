@@ -29,7 +29,7 @@ public class CellInfo {
 			type = "blank";
 			formula = null;
 		} else {
-			readCellValueAndType(cell.getCellTypeEnum(), cell);
+			readCellValueAndType(cell.getCellType(), cell);
 		}
 	}
 
@@ -69,7 +69,7 @@ public class CellInfo {
 			} catch (FormulaParseException e) {
 
 			}
-			CellType resultCellType = cell.getCachedFormulaResultTypeEnum();
+			CellType resultCellType = cell.getCachedFormulaResultType();
 			readCellValueAndType(resultCellType, cell);
 			break;
 		default:

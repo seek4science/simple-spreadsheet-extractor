@@ -45,13 +45,13 @@ public abstract class XMLStyleGenerator {
 
 	public static boolean isStyleEmpty(CellStyle style, XMLStyleHelper helper) {
 
-		if (style.getBorderTopEnum() != BorderStyle.NONE)
+		if (style.getBorderTop() != BorderStyle.NONE)
 			return false;
-		if (style.getBorderBottomEnum() != BorderStyle.NONE)
+		if (style.getBorderBottom() != BorderStyle.NONE)
 			return false;
-		if (style.getBorderLeftEnum() != BorderStyle.NONE)
+		if (style.getBorderLeft() != BorderStyle.NONE)
 			return false;
-		if (style.getBorderRightEnum() != BorderStyle.NONE)
+		if (style.getBorderRight() != BorderStyle.NONE)
 			return false;
 
 		// Background/fill colour
@@ -66,25 +66,25 @@ public abstract class XMLStyleGenerator {
 		String border = "none";
 		xmlWriter.writeStartElement("style");
 		xmlWriter.writeAttribute("id", "style" + style.getIndex());
-		if ((border = BORDERS.get(style.getBorderTopEnum())) != "none") {
+		if ((border = BORDERS.get(style.getBorderTop())) != "none") {
 			xmlWriter.writeStartElement("border-top");
 			xmlWriter.writeCharacters(border);
 			xmlWriter.writeEndElement();
 		}
 
-		if ((border = BORDERS.get(style.getBorderBottomEnum())) != "none") {
+		if ((border = BORDERS.get(style.getBorderBottom())) != "none") {
 			xmlWriter.writeStartElement("border-bottom");
 			xmlWriter.writeCharacters(border);
 			xmlWriter.writeEndElement();
 		}
 
-		if ((border = BORDERS.get(style.getBorderLeftEnum())) != "none") {
+		if ((border = BORDERS.get(style.getBorderLeft())) != "none") {
 			xmlWriter.writeStartElement("border-left");
 			xmlWriter.writeCharacters(border);
 			xmlWriter.writeEndElement();
 		}
 
-		if ((border = BORDERS.get(style.getBorderRightEnum())) != "none") {
+		if ((border = BORDERS.get(style.getBorderRight())) != "none") {
 			xmlWriter.writeStartElement("border-right");
 			xmlWriter.writeCharacters(border);
 			xmlWriter.writeEndElement();
