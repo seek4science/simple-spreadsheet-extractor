@@ -5,7 +5,7 @@
 	<artifactId>simple-spreadsheet-extractor</artifactId>
 	<name>POI Based Spreadsheet parser</name>
 	<description>Simple command line app that translates a Spreadsheet file to an XML document</description>
-        <version>0.17.0</version>
+        <version>0.18.0</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -53,23 +53,38 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>                                
+				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
 				</configuration>
-			</plugin>
+			</plugin>			
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>				
+				<groupId>
+					org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>org.sysmodb.ExtractorMain</mainClass>
+							<mainClass>
+								org.sysmodb.ExtractorMain</mainClass>
 							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
+							<classpathPrefix>
+								lib/</classpathPrefix>
 						</manifest>
 					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>
+					org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<outputDirectory>
+						${project.build.directory}/lib
+					</outputDirectory>
+					<includeScope>
+						compile</includeScope>
 				</configuration>
 			</plugin>
 		</plugins>
