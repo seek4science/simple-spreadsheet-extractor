@@ -5,7 +5,7 @@
 	<artifactId>simple-spreadsheet-extractor</artifactId>
 	<name>POI Based Spreadsheet parser</name>
 	<description>Simple command line app that translates a Spreadsheet file to an XML document</description>
-        <version>0.18.0</version>
+        <version>0.18.1</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
